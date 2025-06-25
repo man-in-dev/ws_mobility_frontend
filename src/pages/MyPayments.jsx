@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Payment } from "@/api/entities";
 import { Commission } from "@/api/entities";
@@ -5,9 +6,9 @@ import { User } from "@/api/entities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  CreditCard, 
-  DollarSign, 
+import {
+  CreditCard,
+  IndianRupee, // Changed from DollarSign to IndianRupee
   TrendingDown,
   Banknote
 } from "lucide-react";
@@ -32,19 +33,19 @@ export default function MyPayments() {
     try {
       const userData = await User.me();
       setUser(userData);
-      
+
       const [userPayments, userCommissions] = await Promise.all([
         Payment.filter({ payee_id: userData.id }, "-created_date"),
         Commission.filter({ user_id: userData.id }, "-created_date")
       ]);
-      
+
       setPayments(userPayments);
       setCommissions(userCommissions);
-      
+
       // Calculate statistics
       const totalEarnings = userPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
       const totalCommissions = userCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
-      
+
       setStats({
         totalEarnings,
         totalCommissions,
@@ -105,7 +106,7 @@ export default function MyPayments() {
                   <p className="text-2xl font-bold text-slate-900">₹{stats.totalEarnings.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-green-600" />
+                  <IndianRupee className="w-6 h-6 text-green-600" /> {/* Changed icon to IndianRupee */}
                 </div>
               </div>
             </CardContent>
@@ -181,7 +182,7 @@ export default function MyPayments() {
                   </table>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="payments" className="mt-4">
                  <div className="overflow-x-auto">
                   <table className="w-full">

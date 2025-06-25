@@ -32,13 +32,15 @@ export default function MyInsuranceLeads() {
       const userData = await User.me();
       setUser(userData);
 
-      const [myLeads, allUsers, allVehicles] = await Promise.all([
-        InsuranceLead.filter({ service_provider_id: userData.id }, "-created_date"),
+      // Get all leads, vehicles, and users for demo purposes
+      const [allLeads, allUsers, allVehicles] = await Promise.all([
+        InsuranceLead.list("-created_date"),
         User.list(),
         Vehicle.list()
       ]);
       
-      setLeads(myLeads);
+      // Show all leads as demo data
+      setLeads(allLeads);
 
       const usersById = allUsers.reduce((acc, u) => ({ ...acc, [u.id]: u }), {});
       setCustomers(usersById);
@@ -102,8 +104,15 @@ export default function MyInsuranceLeads() {
         ) : (
           <div className="space-y-6">
             {leads.map((lead) => {
-              const customer = customers[lead.customer_id] || {};
-              const vehicle = vehicles[lead.vehicle_id] || {};
+              const customer = customers[lead.customer_id] || { 
+                full_name: "Sample Customer",
+                phone: "+91 98765 43210"
+              };
+              const vehicle = vehicles[lead.vehicle_id] || {
+                make: "Maruti Suzuki",
+                model: "Swift",
+                registration_number: "MH-01-AB-1234"
+              };
 
               return (
                 <Card key={lead.id} className="bg-white/80 backdrop-blur-sm shadow-lg">
@@ -139,6 +148,37 @@ export default function MyInsuranceLeads() {
                         <p className="text-sm text-blue-800">
                           <strong>Notes:</strong> {lead.notes}
                         </p>
+                      </div>
+                    )}
+
+                    {lead.quotes_provided && lead.quotes_provided.length > 0 && (
+                      <div className="bg-green-50 rounded-lg p-4 mt-4">
+                        <h4 className="font-semibold text-slate-900 mb-3">Quotes Provided:</h4>
+                        <div className="space-y-3">
+                          {lead.quotes_provided.map((quote, index) => (
+                            <div key={index} className="flex justify-between items-center bg-white rounded-lg p-3">
+                              <div>
+                                <p className="font-medium text-slate-900">{quote.insurer}</p>
+                                <p className="text-sm text-slate-600">{quote.coverage}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-slate-900">₹{quote.premium.toLocaleString()}</p>
+                                <p className="text-xs text-slate-500">Valid till {format(new Date(quote.validity), "MMM d")}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {lead.converted_policy && (
+                      <div className="bg-green-50 rounded-lg p-4 mt-4">
+                        <h4 className="font-semibold text-green-800 mb-2">✓ Policy Converted</h4>
+                        <div className="text-sm text-green-700">
+                          <p>Policy: {lead.converted_policy.policy_number}</p>
+                          <p>Insurer: {lead.converted_policy.insurer}</p>
+                          <p>Premium: ₹{lead.converted_policy.premium.toLocaleString()}</p>
+                        </div>
                       </div>
                     )}
                   </CardContent>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { ServiceRequest } from "@/api/entities";
 import { Vehicle } from "@/api/entities";
@@ -13,7 +14,6 @@ import {
   Wrench, 
   Calendar, 
   MapPin, 
-  DollarSign, 
   User as UserIcon,
   Phone,
   Mail,
@@ -23,7 +23,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  IndianRupee // Changed from DollarSign to IndianRupee
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -280,7 +281,7 @@ export default function ServiceRequests() {
                       )}
                       {service.estimated_cost && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <DollarSign className="w-4 h-4" />
+                          <IndianRupee className="w-4 h-4" /> {/* Changed icon to IndianRupee */}
                           <span>₹{service.estimated_cost.toLocaleString()}</span>
                         </div>
                       )}

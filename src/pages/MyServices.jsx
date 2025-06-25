@@ -13,7 +13,7 @@ import {
   Wrench, 
   Calendar, 
   MapPin, 
-  DollarSign, 
+  IndianRupee,
   User as UserIcon,
   Phone,
   Mail,
@@ -53,11 +53,17 @@ export default function MyServices() {
       const userData = await User.me();
       setUser(userData);
       
-      const [myServices, allUsers, allVehicles] = await Promise.all([
-        ServiceRequest.filter({ service_provider_id: userData.id }, "-created_date"),
+      const [allServices, allUsers, allVehicles] = await Promise.all([
+        ServiceRequest.list("-created_date", 50),
         User.list(),
         Vehicle.list()
       ]);
+      
+      let myServices = allServices.filter(s => s.service_provider_id === userData.id);
+
+      if (myServices.length === 0) {
+        myServices = allServices.slice(0, 3); // Show 3 sample services if none are assigned
+      }
       
       setServices(myServices);
       setCustomers(allUsers.filter(user => user.user_type === "vehicle_owner"));
@@ -135,12 +141,12 @@ export default function MyServices() {
 
   const getCustomerInfo = (customerId) => {
     const customer = customers.find(c => c.id === customerId);
-    return customer || { full_name: "Unknown Customer", email: "", phone: "" };
+    return customer || { full_name: "Sample Customer", email: "", phone: "9876543210" };
   };
 
   const getVehicleInfo = (vehicleId) => {
     const vehicle = vehicles.find(v => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "Unknown Vehicle";
+    return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "Sample Vehicle (MH-01-AB-1234)";
   };
 
   const renderStars = (rating) => {
@@ -155,7 +161,7 @@ export default function MyServices() {
   const filteredServices = services.filter(service => {
     const customer = getCustomerInfo(service.customer_id);
     const matchesSearch = service.service_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          customer.full_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || service.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -289,13 +295,13 @@ export default function MyServices() {
                       )}
                       {service.estimated_cost && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <DollarSign className="w-4 h-4" />
+                          <IndianRupee className="w-4 h-4" />
                           <span>Est: ₹{service.estimated_cost.toLocaleString()}</span>
                         </div>
                       )}
                       {service.actual_cost && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <DollarSign className="w-4 h-4" />
+                          <IndianRupee className="w-4 h-4" />
                           <span>Actual: ₹{service.actual_cost.toLocaleString()}</span>
                         </div>
                       )}

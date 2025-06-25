@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { InventoryOrder } from "@/api/entities";
 import { User } from "@/api/entities";
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { 
   Package, 
   Calendar, 
-  DollarSign, 
+  IndianRupee, // Changed from DollarSign to IndianRupee
   Truck,
   Search,
   Filter,
@@ -201,7 +202,7 @@ export default function MyOrders() {
                           <span>{format(new Date(order.created_date), "MMM d, yyyy")}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <DollarSign className="w-4 h-4" />
+                          <IndianRupee className="w-4 h-4" /> {/* Changed icon to IndianRupee */}
                           <span>₹{order.total_amount.toLocaleString()}</span>
                         </div>
                       </div>

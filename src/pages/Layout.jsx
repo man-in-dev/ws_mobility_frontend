@@ -4,12 +4,12 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { User } from "@/api/entities";
-import { 
-  LayoutDashboard, 
-  Wrench, 
-  Car, 
-  Package, 
-  CreditCard, 
+import {
+  LayoutDashboard,
+  Wrench,
+  Car,
+  Package,
+  CreditCard,
   Shield,
   Users,
   Settings,
@@ -24,7 +24,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarMenu,  
+  SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
@@ -45,7 +45,7 @@ export default function Layout({ children, currentPageName }) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [showProfileSetup, setShowProfileSetup] = React.useState(false);
   const [profileData, setProfileData] = React.useState({
-    user_type: "",
+    user_type: "service_provider", // Default to service_provider
     phone: "",
     business_name: "",
     address: "",
@@ -55,6 +55,8 @@ export default function Layout({ children, currentPageName }) {
   });
 
   React.useEffect(() => {
+    // Set browser title
+    document.title = "WS Mobility - Multi-Vehicle Service Platform";
     loadUser();
   }, []);
 
@@ -62,12 +64,11 @@ export default function Layout({ children, currentPageName }) {
     try {
       const userData = await User.me();
       setUser(userData);
-      
-      // Check if user needs to complete profile
+
       if (!userData.user_type) {
         setShowProfileSetup(true);
         setProfileData({
-          user_type: userData.user_type || "",
+          user_type: "service_provider", // Always set to service_provider for new users
           phone: userData.phone || "",
           business_name: userData.business_name || "",
           address: userData.address || "",
@@ -87,7 +88,6 @@ export default function Layout({ children, currentPageName }) {
     try {
       await User.updateMyUserData(profileData);
       setShowProfileSetup(false);
-      // Reload user data
       const updatedUser = await User.me();
       setUser(updatedUser);
     } catch (error) {
@@ -111,161 +111,43 @@ export default function Layout({ children, currentPageName }) {
       }
     ];
 
-    switch (user.user_type) {
-      case "admin":
-        return [
-          ...baseItems,
-          {
-            title: "Service Requests",
-            url: createPageUrl("ServiceRequests"),
-            icon: Wrench,
-          },
-          {
-            title: "Inventory Management",
-            url: createPageUrl("InventoryManagement"),
-            icon: Package,
-          },
-          {
-            title: "User Management",
-            url: createPageUrl("UserManagement"),
-            icon: Users,
-          },
-          {
-            title: "Payments & Settlement",
-            url: createPageUrl("PaymentSettlement"),
-            icon: CreditCard,
-          },
-          {
-            title: "Insurance Leads",
-            url: createPageUrl("InsuranceLeads"),
-            icon: Shield,
-          }
-        ];
-      
-      case "service_provider":
-        return [
-          ...baseItems,
-          {
-            title: "My Services",
-            url: createPageUrl("MyServices"),
-            icon: Wrench,
-          },
-          {
-            title: "Order Parts",
-            url: createPageUrl("OrderParts"),
-            icon: Package,
-          },
-          {
-            title: "My Orders",
-            url: createPageUrl("MyOrders"),
-            icon: Package,
-          },
-          {
-            title: "Payments",
-            url: createPageUrl("MyPayments"),
-            icon: CreditCard,
-          },
-          {
-            title: "Insurance Leads",
-            url: createPageUrl("MyInsuranceLeads"),
-            icon: Shield,
-          }
-        ];
-      
-      case "vehicle_owner":
-        return [
-          ...baseItems,
-          {
-            title: "My Vehicles",
-            url: createPageUrl("MyVehicles"),
-            icon: Car,
-          },
-          {
-            title: "Book Service",
-            url: createPageUrl("BookService"),
-            icon: Wrench,
-          },
-          {
-            title: "Service History",
-            url: createPageUrl("ServiceHistory"),
-            icon: Wrench,
-          },
-          {
-            title: "Insurance",
-            url: createPageUrl("Insurance"),
-            icon: Shield,
-          }
-        ];
-      
-      case "payment_collector":
-        return [
-          ...baseItems,
-          {
-            title: "Payment Collection",
-            url: createPageUrl("PaymentCollection"),
-            icon: CreditCard,
-          }
-        ];
-      
-      case "warehouse_staff":
-        return [
-          ...baseItems,
-          {
-            title: "Packing Orders",
-            url: createPageUrl("PackingOrders"),
-            icon: Package,
-          }
-        ];
-      
-      case "dispatcher":
-        return [
-          ...baseItems,
-          {
-            title: "Dispatch Orders",
-            url: createPageUrl("DispatchOrders"),
-            icon: Package,
-          }
-        ];
-      
-      case "insurance_agent":
-        return [
-          ...baseItems,
-          {
-            title: "Insurance Leads",
-            url: createPageUrl("InsuranceAgentLeads"),
-            icon: Shield,
-          }
-        ];
-      
-      default:
-        return baseItems;
-    }
+    // Since we're only supporting service_provider now, simplify this
+    return [
+      ...baseItems,
+      {
+        title: "My Services",
+        url: createPageUrl("MyServices"),
+        icon: Wrench,
+      },
+      {
+        title: "Order Parts",
+        url: createPageUrl("OrderParts"),
+        icon: Package,
+      },
+      {
+        title: "My Orders",
+        url: createPageUrl("MyOrders"),
+        icon: Package,
+      },
+      {
+        title: "Payments",
+        url: createPageUrl("MyPayments"),
+        icon: CreditCard,
+      },
+      {
+        title: "Insurance Leads",
+        url: createPageUrl("MyInsuranceLeads"),
+        icon: Shield,
+      }
+    ];
   };
 
   const getUserTypeLabel = (type) => {
-    const labels = {
-      admin: "Administrator",
-      service_provider: "Service Provider",
-      vehicle_owner: "Vehicle Owner",
-      payment_collector: "Payment Collector",
-      warehouse_staff: "Warehouse Staff",
-      dispatcher: "Dispatcher",
-      insurance_agent: "Insurance Agent"
-    };
-    return labels[type] || type;
+    return "Service Provider"; // Always returns Service Provider
   };
 
   const getUserTypeBadgeColor = (type) => {
-    const colors = {
-      admin: "bg-red-100 text-red-800",
-      service_provider: "bg-blue-100 text-blue-800",
-      vehicle_owner: "bg-green-100 text-green-800",  
-      payment_collector: "bg-yellow-100 text-yellow-800",
-      warehouse_staff: "bg-purple-100 text-purple-800",
-      dispatcher: "bg-orange-100 text-orange-800",
-      insurance_agent: "bg-pink-100 text-pink-800"
-    };
-    return colors[type] || "bg-gray-100 text-gray-800";
+    return "bg-blue-100 text-blue-800"; // Always returns color for Service Provider
   };
 
   if (isLoading) {
@@ -281,36 +163,41 @@ export default function Layout({ children, currentPageName }) {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="flex justify-center mb-6">
             <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/1f2c382ff_image.png" 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/8644275f6_image.png" 
               alt="WS Mobility" 
-              className="h-16 w-auto"
+              className="h-20 w-auto"
             />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">WS Mobility</h1>
-          <p className="text-slate-600 mb-6">Multi-Vehicle Service Aggregator Platform</p>
-          <Button onClick={() => User.login()} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-            Sign In to Continue
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome to WS Mobility</h1>
+          <p className="text-slate-600 mb-6">Please sign in to continue</p>
+          <Button onClick={() => User.login()} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg py-3">
+            <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
           </Button>
         </div>
       </div>
     );
   }
 
-  // Show profile setup if user doesn't have user_type
   if (showProfileSetup) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/1f2c382ff_image.png" 
-                alt="WS Mobility" 
-                className="h-16 w-auto"
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/8644275f6_image.png"
+                alt="WS Mobility"
+                className="h-20 w-auto"
               />
             </div>
             <CardTitle className="text-2xl">Complete Your Profile</CardTitle>
@@ -329,13 +216,7 @@ export default function Layout({ children, currentPageName }) {
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="vehicle_owner">Vehicle Owner</SelectItem>
                     <SelectItem value="service_provider">Service Provider</SelectItem>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="payment_collector">Payment Collector</SelectItem>
-                    <SelectItem value="warehouse_staff">Warehouse Staff</SelectItem>
-                    <SelectItem value="dispatcher">Dispatcher</SelectItem>
-                    <SelectItem value="insurance_agent">Insurance Agent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -351,17 +232,17 @@ export default function Layout({ children, currentPageName }) {
                     required
                   />
                 </div>
-                {profileData.user_type === "service_provider" && (
-                  <div>
-                    <Label htmlFor="business_name">Business Name</Label>
-                    <Input
-                      id="business_name"
-                      value={profileData.business_name}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, business_name: e.target.value }))}
-                      placeholder="Your business name"
-                    />
-                  </div>
-                )}
+                {/* Always show business_name as user_type is fixed to service_provider */}
+                <div>
+                  <Label htmlFor="business_name">Business Name</Label>
+                  <Input
+                    id="business_name"
+                    value={profileData.business_name}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, business_name: e.target.value }))}
+                    placeholder="Your business name"
+                    required // Made required
+                  />
+                </div>
               </div>
 
               <div>
@@ -371,6 +252,7 @@ export default function Layout({ children, currentPageName }) {
                   value={profileData.address}
                   onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
                   placeholder="Your address"
+                  required // Made required
                 />
               </div>
 
@@ -382,6 +264,7 @@ export default function Layout({ children, currentPageName }) {
                     value={profileData.city}
                     onChange={(e) => setProfileData(prev => ({ ...prev, city: e.target.value }))}
                     placeholder="City"
+                    required // Made required
                   />
                 </div>
                 <div>
@@ -391,6 +274,7 @@ export default function Layout({ children, currentPageName }) {
                     value={profileData.state}
                     onChange={(e) => setProfileData(prev => ({ ...prev, state: e.target.value }))}
                     placeholder="State"
+                    required // Made required
                   />
                 </div>
                 <div>
@@ -400,12 +284,13 @@ export default function Layout({ children, currentPageName }) {
                     value={profileData.pincode}
                     onChange={(e) => setProfileData(prev => ({ ...prev, pincode: e.target.value }))}
                     placeholder="Pincode"
+                    required // Made required
                   />
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
                 Complete Profile
@@ -425,18 +310,18 @@ export default function Layout({ children, currentPageName }) {
         <Sidebar className="border-r border-slate-200 bg-white/80 backdrop-blur-sm">
           <SidebarHeader className="border-b border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/1f2c382ff_image.png" 
-                alt="WS Mobility" 
-                className="h-10 w-auto"
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/8644275f6_image.png"
+                alt="WS Mobility"
+                className="h-12 w-auto"
               />
               <div>
                 <h2 className="font-bold text-slate-900">WS Mobility</h2>
-                <p className="text-xs text-slate-500">Multi-Vehicle Platform</p>
+                <p className="text-xs text-slate-500">Service Provider Portal</p>
               </div>
             </div>
           </SidebarHeader>
-          
+
           <SidebarContent className="p-3">
             <SidebarGroup>
               <SidebarGroupLabel className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 py-2">
@@ -446,8 +331,8 @@ export default function Layout({ children, currentPageName }) {
                 <SidebarMenu>
                   {navigationItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton 
-                        asChild 
+                      <SidebarMenuButton
+                        asChild
                         className={`hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 rounded-xl mb-1 ${
                           location.pathname === item.url ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm' : ''
                         }`}
@@ -473,16 +358,15 @@ export default function Layout({ children, currentPageName }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-slate-900 text-sm truncate">{user.full_name}</p>
-                {user.user_type && (
-                  <Badge className={`text-xs ${getUserTypeBadgeColor(user.user_type)}`}>
-                    {getUserTypeLabel(user.user_type)}
-                  </Badge>
-                )}
+                {/* user.user_type check is implicitly true for service_provider, but keeping it doesn't hurt */}
+                <Badge className={`text-xs ${getUserTypeBadgeColor(user.user_type)}`}>
+                  {getUserTypeLabel(user.user_type)}
+                </Badge>
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleLogout}
               className="w-full text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             >
@@ -496,9 +380,9 @@ export default function Layout({ children, currentPageName }) {
           <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4 md:hidden">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/1f2c382ff_image.png" 
-                alt="WS Mobility" 
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/8644275f6_image.png"
+                alt="WS Mobility"
                 className="h-8 w-auto"
               />
               <h1 className="text-xl font-bold text-slate-900">WS Mobility</h1>

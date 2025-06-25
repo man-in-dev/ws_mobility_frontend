@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { ServiceRequest } from "@/api/entities";
 import { Vehicle } from "@/api/entities";
@@ -7,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Wrench, 
-  Calendar, 
-  MapPin, 
-  DollarSign, 
+import {
+  Wrench,
+  Calendar,
+  MapPin,
+  IndianRupee, // Changed from DollarSign to IndianRupee
   Star,
   Search,
   Filter,
@@ -44,12 +45,12 @@ export default function ServiceHistory() {
     try {
       const userData = await User.me();
       setUser(userData);
-      
+
       const [userServices, userVehicles] = await Promise.all([
         ServiceRequest.filter({ customer_id: userData.id }, "-created_date"),
         Vehicle.filter({ owner_id: userData.id })
       ]);
-      
+
       setServices(userServices);
       setVehicles(userVehicles);
     } catch (error) {
@@ -63,7 +64,7 @@ export default function ServiceHistory() {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(service => 
+      filtered = filtered.filter(service =>
         service.service_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
         service.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -193,7 +194,7 @@ export default function ServiceHistory() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
@@ -216,7 +217,7 @@ export default function ServiceHistory() {
               <Wrench className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-2">No Services Found</h3>
               <p className="text-slate-600 mb-6">
-                {services.length === 0 
+                {services.length === 0
                   ? "You haven't booked any services yet"
                   : "No services match your current filters"
                 }
@@ -256,7 +257,7 @@ export default function ServiceHistory() {
                     <div className="flex items-center gap-2 text-sm text-slate-600">
                       <Calendar className="w-4 h-4" />
                       <span>
-                        {service.scheduled_date 
+                        {service.scheduled_date
                           ? format(new Date(service.scheduled_date), "MMM d, yyyy")
                           : "Not scheduled"
                         }
@@ -270,7 +271,7 @@ export default function ServiceHistory() {
                     )}
                     {service.actual_cost && (
                       <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <DollarSign className="w-4 h-4" />
+                        <IndianRupee className="w-4 h-4" /> {/* Changed DollarSign to IndianRupee */}
                         <span>₹{service.actual_cost.toLocaleString()}</span>
                       </div>
                     )}

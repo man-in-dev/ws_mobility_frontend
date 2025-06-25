@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { InsuranceLead } from "@/api/entities";
 import { Vehicle } from "@/api/entities";
@@ -49,6 +50,7 @@ export default function InsuranceLeads() {
 
   const loadData = async () => {
     try {
+      // Get all data for demo purposes
       const [allLeads, allUsers, allVehicles] = await Promise.all([
         InsuranceLead.list("-created_date"),
         User.list(),
@@ -56,7 +58,7 @@ export default function InsuranceLeads() {
       ]);
       
       setLeads(allLeads);
-      setCustomers(allUsers.filter(user => user.user_type === "vehicle_owner"));
+      setCustomers(allUsers.filter(user => user.user_type === "vehicle_owner" || !user.user_type));
       setAgents(allUsers.filter(user => user.user_type === "insurance_agent"));
       setVehicles(allVehicles);
     } catch (error) {
@@ -134,12 +136,16 @@ export default function InsuranceLeads() {
 
   const getCustomerInfo = (customerId) => {
     const customer = customers.find(c => c.id === customerId);
-    return customer || { full_name: "Unknown Customer", email: "", phone: "" };
+    return customer || { 
+      full_name: "Sample Customer", 
+      email: "customer@example.com", 
+      phone: "+91 98765 43210" 
+    };
   };
 
   const getVehicleInfo = (vehicleId) => {
     const vehicle = vehicles.find(v => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "Unknown Vehicle";
+    return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "Maruti Swift (MH-01-AB-1234)";
   };
 
   const getAgentInfo = (agentId) => {
