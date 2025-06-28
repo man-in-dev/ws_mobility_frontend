@@ -1,19 +1,27 @@
-
 import React, { useState, useEffect } from "react";
-import { InsuranceLead } from "@/api/entities";
-import { Vehicle } from "@/api/entities";
-import { User } from "@/api/entities";
+import { InsuranceLead, Vehicle, User } from "@/api/entities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { 
-  Shield, 
-  Calendar, 
-  DollarSign, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Shield,
+  Calendar,
+  DollarSign,
   User as UserIcon,
   Phone,
   Mail,
@@ -23,7 +31,7 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -41,7 +49,7 @@ export default function InsuranceLeads() {
   const [assignFormData, setAssignFormData] = useState({
     insurance_agent_id: "",
     priority: "medium",
-    notes: ""
+    notes: "",
   });
 
   useEffect(() => {
@@ -54,12 +62,18 @@ export default function InsuranceLeads() {
       const [allLeads, allUsers, allVehicles] = await Promise.all([
         InsuranceLead.list("-created_date"),
         User.list(),
-        Vehicle.list()
+        Vehicle.list(),
       ]);
-      
+
       setLeads(allLeads);
-      setCustomers(allUsers.filter(user => user.user_type === "vehicle_owner" || !user.user_type));
-      setAgents(allUsers.filter(user => user.user_type === "insurance_agent"));
+      setCustomers(
+        allUsers.filter(
+          (user) => user.user_type === "vehicle_owner" || !user.user_type
+        )
+      );
+      setAgents(
+        allUsers.filter((user) => user.user_type === "insurance_agent")
+      );
       setVehicles(allVehicles);
     } catch (error) {
       console.error("Error loading data:", error);
@@ -85,12 +99,16 @@ export default function InsuranceLeads() {
         insurance_agent_id: assignFormData.insurance_agent_id,
         priority: assignFormData.priority,
         status: "contacted",
-        notes: assignFormData.notes
+        notes: assignFormData.notes,
       });
-      
+
       setShowAssignDialog(false);
       setSelectedLead(null);
-      setAssignFormData({ insurance_agent_id: "", priority: "medium", notes: "" });
+      setAssignFormData({
+        insurance_agent_id: "",
+        priority: "medium",
+        notes: "",
+      });
       loadData();
     } catch (error) {
       console.error("Error assigning agent:", error);
@@ -120,7 +138,7 @@ export default function InsuranceLeads() {
       contacted: "bg-blue-100 text-blue-800",
       quoted: "bg-purple-100 text-purple-800",
       converted: "bg-green-100 text-green-800",
-      lost: "bg-red-100 text-red-800"
+      lost: "bg-red-100 text-red-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -129,35 +147,41 @@ export default function InsuranceLeads() {
     const colors = {
       low: "bg-green-100 text-green-800",
       medium: "bg-yellow-100 text-yellow-800",
-      high: "bg-red-100 text-red-800"
+      high: "bg-red-100 text-red-800",
     };
     return colors[priority] || "bg-gray-100 text-gray-800";
   };
 
   const getCustomerInfo = (customerId) => {
-    const customer = customers.find(c => c.id === customerId);
-    return customer || { 
-      full_name: "Sample Customer", 
-      email: "customer@example.com", 
-      phone: "+91 98765 43210" 
-    };
+    const customer = customers.find((c) => c.id === customerId);
+    return (
+      customer || {
+        full_name: "Sample Customer",
+        email: "customer@example.com",
+        phone: "+91 98765 43210",
+      }
+    );
   };
 
   const getVehicleInfo = (vehicleId) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "Maruti Swift (MH-01-AB-1234)";
+    const vehicle = vehicles.find((v) => v.id === vehicleId);
+    return vehicle
+      ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})`
+      : "Maruti Swift (MH-01-AB-1234)";
   };
 
   const getAgentInfo = (agentId) => {
-    const agent = agents.find(a => a.id === agentId);
+    const agent = agents.find((a) => a.id === agentId);
     return agent || { full_name: "Unassigned" };
   };
 
-  const filteredLeads = leads.filter(lead => {
+  const filteredLeads = leads.filter((lead) => {
     const customer = getCustomerInfo(lead.customer_id);
-    const matchesSearch = customer.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         lead.lead_type.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || lead.status === statusFilter;
+    const matchesSearch =
+      customer.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.lead_type.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || lead.status === statusFilter;
     const matchesType = typeFilter === "all" || lead.lead_type === typeFilter;
     return matchesSearch && matchesStatus && matchesType;
   });
@@ -179,7 +203,9 @@ export default function InsuranceLeads() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Insurance Leads</h1>
-          <p className="text-slate-600 mt-1">Manage customer insurance leads and assignments</p>
+          <p className="text-slate-600 mt-1">
+            Manage customer insurance leads and assignments
+          </p>
         </div>
 
         {/* Filters */}
@@ -216,10 +242,12 @@ export default function InsuranceLeads() {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="new_policy">New Policy</SelectItem>
                   <SelectItem value="renewal">Renewal</SelectItem>
-                  <SelectItem value="claim_assistance">Claim Assistance</SelectItem>
+                  <SelectItem value="claim_assistance">
+                    Claim Assistance
+                  </SelectItem>
                 </SelectContent>
               </Select>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
@@ -240,8 +268,12 @@ export default function InsuranceLeads() {
           <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-12 text-center">
               <Shield className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Insurance Leads</h3>
-              <p className="text-slate-600">No insurance leads match your current filters</p>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No Insurance Leads
+              </h3>
+              <p className="text-slate-600">
+                No insurance leads match your current filters
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -249,16 +281,23 @@ export default function InsuranceLeads() {
             {filteredLeads.map((lead) => {
               const customer = getCustomerInfo(lead.customer_id);
               const agent = getAgentInfo(lead.insurance_agent_id);
-              
+
               return (
-                <Card key={lead.id} className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+                <Card
+                  key={lead.id}
+                  className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4">
                       <div>
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                          {lead.lead_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {lead.lead_type
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </h3>
-                        <p className="text-slate-600 mb-2">{getVehicleInfo(lead.vehicle_id)}</p>
+                        <p className="text-slate-600 mb-2">
+                          {getVehicleInfo(lead.vehicle_id)}
+                        </p>
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <UserIcon className="w-4 h-4" />
                           <span>{customer.full_name}</span>
@@ -271,11 +310,17 @@ export default function InsuranceLeads() {
                         </div>
                       </div>
                       <div className="flex gap-2 mt-4 lg:mt-0">
-                        <Badge className={`${getStatusColor(lead.status)} border-0`}>
+                        <Badge
+                          className={`${getStatusColor(lead.status)} border-0`}
+                        >
                           {getStatusIcon(lead.status)}
                           <span className="ml-1">{lead.status}</span>
                         </Badge>
-                        <Badge className={`${getPriorityColor(lead.priority)} border-0`}>
+                        <Badge
+                          className={`${getPriorityColor(
+                            lead.priority
+                          )} border-0`}
+                        >
                           {lead.priority}
                         </Badge>
                       </div>
@@ -284,12 +329,16 @@ export default function InsuranceLeads() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                       <div className="flex items-center gap-2 text-sm text-slate-600">
                         <Calendar className="w-4 h-4" />
-                        <span>{format(new Date(lead.created_date), "MMM d, yyyy")}</span>
+                        <span>
+                          {format(new Date(lead.created_date), "MMM d, yyyy")}
+                        </span>
                       </div>
                       {lead.budget_range && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <DollarSign className="w-4 h-4" />
-                          <span>₹{lead.budget_range.min} - ₹{lead.budget_range.max}</span>
+                          <span>
+                            ₹{lead.budget_range.min} - ₹{lead.budget_range.max}
+                          </span>
                         </div>
                       )}
                       <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -301,50 +350,80 @@ export default function InsuranceLeads() {
                       </div>
                     </div>
 
-                    {lead.coverage_required && lead.coverage_required.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-slate-700 mb-2">Coverage Required:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {lead.coverage_required.map((coverage) => (
-                            <Badge key={coverage} variant="outline" className="text-xs">
-                              {coverage.replace(/_/g, ' ')}
-                            </Badge>
-                          ))}
+                    {lead.coverage_required &&
+                      lead.coverage_required.length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-sm font-medium text-slate-700 mb-2">
+                            Coverage Required:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {lead.coverage_required.map((coverage) => (
+                              <Badge
+                                key={coverage}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                {coverage.replace(/_/g, " ")}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {lead.current_policy && (
                       <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                        <h4 className="font-semibold text-blue-800 mb-2">Current Policy</h4>
+                        <h4 className="font-semibold text-blue-800 mb-2">
+                          Current Policy
+                        </h4>
                         <div className="text-sm text-blue-700">
                           <p>Policy: {lead.current_policy.policy_number}</p>
                           <p>Insurer: {lead.current_policy.insurer}</p>
                           <p>Premium: ₹{lead.current_policy.premium}</p>
-                          <p>Expires: {format(new Date(lead.current_policy.expiry_date), "MMM d, yyyy")}</p>
+                          <p>
+                            Expires:{" "}
+                            {format(
+                              new Date(lead.current_policy.expiry_date),
+                              "MMM d, yyyy"
+                            )}
+                          </p>
                         </div>
                       </div>
                     )}
 
-                    {lead.quotes_provided && lead.quotes_provided.length > 0 && (
-                      <div className="bg-green-50 rounded-lg p-4 mb-4">
-                        <h4 className="font-semibold text-green-800 mb-3">Quotes Provided:</h4>
-                        <div className="space-y-2">
-                          {lead.quotes_provided.map((quote, index) => (
-                            <div key={index} className="flex justify-between items-center bg-white rounded-lg p-3">
-                              <div>
-                                <p className="font-medium text-slate-900">{quote.insurer}</p>
-                                <p className="text-sm text-slate-600">{quote.coverage}</p>
+                    {lead.quotes_provided &&
+                      lead.quotes_provided.length > 0 && (
+                        <div className="bg-green-50 rounded-lg p-4 mb-4">
+                          <h4 className="font-semibold text-green-800 mb-3">
+                            Quotes Provided:
+                          </h4>
+                          <div className="space-y-2">
+                            {lead.quotes_provided.map((quote, index) => (
+                              <div
+                                key={index}
+                                className="flex justify-between items-center bg-white rounded-lg p-3"
+                              >
+                                <div>
+                                  <p className="font-medium text-slate-900">
+                                    {quote.insurer}
+                                  </p>
+                                  <p className="text-sm text-slate-600">
+                                    {quote.coverage}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-bold text-slate-900">
+                                    ₹{quote.premium}
+                                  </p>
+                                  <p className="text-xs text-slate-500">
+                                    Valid till{" "}
+                                    {format(new Date(quote.validity), "MMM d")}
+                                  </p>
+                                </div>
                               </div>
-                              <div className="text-right">
-                                <p className="font-bold text-slate-900">₹{quote.premium}</p>
-                                <p className="text-xs text-slate-500">Valid till {format(new Date(quote.validity), "MMM d")}</p>
-                              </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
                       {lead.status === "new" && (
@@ -360,7 +439,7 @@ export default function InsuranceLeads() {
                           Assign Agent
                         </Button>
                       )}
-                      
+
                       {lead.status === "contacted" && (
                         <Button
                           onClick={() => handleStatusUpdate(lead.id, "quoted")}
@@ -370,11 +449,13 @@ export default function InsuranceLeads() {
                           Mark as Quoted
                         </Button>
                       )}
-                      
+
                       {lead.status === "quoted" && (
                         <>
                           <Button
-                            onClick={() => handleStatusUpdate(lead.id, "converted")}
+                            onClick={() =>
+                              handleStatusUpdate(lead.id, "converted")
+                            }
                             size="sm"
                             className="bg-green-600 hover:bg-green-700"
                           >
@@ -411,7 +492,12 @@ export default function InsuranceLeads() {
                 </label>
                 <Select
                   value={assignFormData.insurance_agent_id}
-                  onValueChange={(value) => setAssignFormData(prev => ({ ...prev, insurance_agent_id: value }))}
+                  onValueChange={(value) =>
+                    setAssignFormData((prev) => ({
+                      ...prev,
+                      insurance_agent_id: value,
+                    }))
+                  }
                   required
                 >
                   <SelectTrigger>
@@ -426,14 +512,16 @@ export default function InsuranceLeads() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Priority
                 </label>
                 <Select
                   value={assignFormData.priority}
-                  onValueChange={(value) => setAssignFormData(prev => ({ ...prev, priority: value }))}
+                  onValueChange={(value) =>
+                    setAssignFormData((prev) => ({ ...prev, priority: value }))
+                  }
                   required
                 >
                   <SelectTrigger>
@@ -446,19 +534,24 @@ export default function InsuranceLeads() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Notes
                 </label>
                 <Textarea
                   value={assignFormData.notes}
-                  onChange={(e) => setAssignFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setAssignFormData((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   placeholder="Additional notes for the agent..."
                   className="h-20"
                 />
               </div>
-              
+
               <div className="flex gap-4 pt-4">
                 <Button
                   type="button"

@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { Payment } from "@/api/entities";
-import { Commission } from "@/api/entities";
-import { User } from "@/api/entities";
+import { Payment, Commission, User } from "@/api/entities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  CreditCard, 
-  DollarSign, 
-  TrendingUp, 
+import {
+  CreditCard,
+  DollarSign,
+  TrendingUp,
   Download,
   Search,
   Filter,
   Calendar,
   Users,
-  Banknote
+  Banknote,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -33,7 +37,7 @@ export default function PaymentSettlement() {
     totalPayments: 0,
     totalCommissions: 0,
     pendingSettlements: 0,
-    monthlyRevenue: 0
+    monthlyRevenue: 0,
   });
 
   useEffect(() => {
@@ -45,33 +49,44 @@ export default function PaymentSettlement() {
       const [allPayments, allCommissions, allUsers] = await Promise.all([
         Payment.list("-created_date"),
         Commission.list("-created_date"),
-        User.list()
+        User.list(),
       ]);
-      
+
       setPayments(allPayments);
       setCommissions(allCommissions);
       setUsers(allUsers);
-      
+
       // Calculate statistics
-      const totalPayments = allPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-      const totalCommissions = allCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
-      const pendingSettlements = allCommissions.filter(c => c.status === "calculated").length;
-      
+      const totalPayments = allPayments.reduce(
+        (sum, p) => sum + (p.amount || 0),
+        0
+      );
+      const totalCommissions = allCommissions.reduce(
+        (sum, c) => sum + (c.commission_amount || 0),
+        0
+      );
+      const pendingSettlements = allCommissions.filter(
+        (c) => c.status === "calculated"
+      ).length;
+
       // Monthly revenue (current month)
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
       const monthlyRevenue = allCommissions
-        .filter(c => {
+        .filter((c) => {
           const commissionDate = new Date(c.created_date);
-          return commissionDate.getMonth() === currentMonth && commissionDate.getFullYear() === currentYear;
+          return (
+            commissionDate.getMonth() === currentMonth &&
+            commissionDate.getFullYear() === currentYear
+          );
         })
         .reduce((sum, c) => sum + (c.commission_amount || 0), 0);
-      
+
       setStats({
         totalPayments,
         totalCommissions,
         pendingSettlements,
-        monthlyRevenue
+        monthlyRevenue,
       });
     } catch (error) {
       console.error("Error loading data:", error);
@@ -82,14 +97,14 @@ export default function PaymentSettlement() {
   const processSettlement = async (commissionIds) => {
     try {
       const batchId = `BATCH-${Date.now()}`;
-      const promises = commissionIds.map(id => 
-        Commission.update(id, { 
+      const promises = commissionIds.map((id) =>
+        Commission.update(id, {
           status: "settled",
           settlement_batch: batchId,
-          settlement_date: new Date().toISOString()
+          settlement_date: new Date().toISOString(),
         })
       );
-      
+
       await Promise.all(promises);
       loadData();
     } catch (error) {
@@ -98,7 +113,7 @@ export default function PaymentSettlement() {
   };
 
   const getUserInfo = (userId) => {
-    const user = users.find(u => u.id === userId);
+    const user = users.find((u) => u.id === userId);
     return user || { full_name: "Unknown User", email: "" };
   };
 
@@ -107,7 +122,7 @@ export default function PaymentSettlement() {
       pending: "bg-yellow-100 text-yellow-800",
       collected: "bg-green-100 text-green-800",
       failed: "bg-red-100 text-red-800",
-      refunded: "bg-gray-100 text-gray-800"
+      refunded: "bg-gray-100 text-gray-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -117,28 +132,37 @@ export default function PaymentSettlement() {
       calculated: "bg-blue-100 text-blue-800",
       deducted: "bg-yellow-100 text-yellow-800",
       settled: "bg-green-100 text-green-800",
-      disputed: "bg-red-100 text-red-800"
+      disputed: "bg-red-100 text-red-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const exportReport = (type) => {
     const data = type === "payments" ? payments : commissions;
-    const headers = type === "payments" 
-      ? ["Payment ID", "Order ID", "Amount", "Status", "Date"]
-      : ["User", "Transaction Type", "Gross Amount", "Commission", "Net Amount", "Status", "Date"];
-    
+    const headers =
+      type === "payments"
+        ? ["Payment ID", "Order ID", "Amount", "Status", "Date"]
+        : [
+            "User",
+            "Transaction Type",
+            "Gross Amount",
+            "Commission",
+            "Net Amount",
+            "Status",
+            "Date",
+          ];
+
     const csvContent = [
-      headers.join(','),
-      ...data.map(item => {
+      headers.join(","),
+      ...data.map((item) => {
         if (type === "payments") {
           return [
             item.payment_id,
             item.order_id,
             item.amount,
             item.payment_status,
-            format(new Date(item.created_date), "yyyy-MM-dd")
-          ].join(',');
+            format(new Date(item.created_date), "yyyy-MM-dd"),
+          ].join(",");
         } else {
           const user = getUserInfo(item.user_id);
           return [
@@ -148,34 +172,43 @@ export default function PaymentSettlement() {
             item.commission_amount,
             item.net_amount,
             item.status,
-            format(new Date(item.created_date), "yyyy-MM-dd")
-          ].join(',');
+            format(new Date(item.created_date), "yyyy-MM-dd"),
+          ].join(",");
         }
-      })
-    ].join('\n');
+      }),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${type}_report_${format(new Date(), "yyyy-MM-dd")}.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `${type}_report_${format(new Date(), "yyyy-MM-dd")}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const filteredPayments = payments.filter(payment => {
-    const matchesSearch = payment.payment_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.order_id?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || payment.payment_status === statusFilter;
+  const filteredPayments = payments.filter((payment) => {
+    const matchesSearch =
+      payment.payment_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.order_id?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || payment.payment_status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const filteredCommissions = commissions.filter(commission => {
+  const filteredCommissions = commissions.filter((commission) => {
     const user = getUserInfo(commission.user_id);
-    const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         commission.transaction_type.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || commission.status === statusFilter;
+    const matchesSearch =
+      user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      commission.transaction_type
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || commission.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -195,8 +228,12 @@ export default function PaymentSettlement() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Payments & Settlement</h1>
-          <p className="text-slate-600 mt-1">Manage payments, commissions, and settlements</p>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Payments & Settlement
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Manage payments, commissions, and settlements
+          </p>
         </div>
 
         {/* Stats Cards */}
@@ -205,8 +242,12 @@ export default function PaymentSettlement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Total Payments</p>
-                  <p className="text-2xl font-bold text-slate-900">₹{stats.totalPayments.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Total Payments
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ₹{stats.totalPayments.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-lg">
                   <CreditCard className="w-6 h-6 text-blue-600" />
@@ -219,8 +260,12 @@ export default function PaymentSettlement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Total Commissions</p>
-                  <p className="text-2xl font-bold text-slate-900">₹{stats.totalCommissions.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Total Commissions
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ₹{stats.totalCommissions.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-lg">
                   <DollarSign className="w-6 h-6 text-green-600" />
@@ -233,8 +278,12 @@ export default function PaymentSettlement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Pending Settlements</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.pendingSettlements}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Pending Settlements
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {stats.pendingSettlements}
+                  </p>
                 </div>
                 <div className="p-3 bg-yellow-100 rounded-lg">
                   <Users className="w-6 h-6 text-yellow-600" />
@@ -247,8 +296,12 @@ export default function PaymentSettlement() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Monthly Revenue</p>
-                  <p className="text-2xl font-bold text-slate-900">₹{stats.monthlyRevenue.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Monthly Revenue
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ₹{stats.monthlyRevenue.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-purple-100 rounded-lg">
                   <TrendingUp className="w-6 h-6 text-purple-600" />
@@ -299,7 +352,7 @@ export default function PaymentSettlement() {
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => {
                       setSearchTerm("");
@@ -357,12 +410,19 @@ export default function PaymentSettlement() {
                             {payment.payment_method}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <Badge className={`${getPaymentStatusColor(payment.payment_status)} border-0`}>
+                            <Badge
+                              className={`${getPaymentStatusColor(
+                                payment.payment_status
+                              )} border-0`}
+                            >
                               {payment.payment_status}
                             </Badge>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                            {format(new Date(payment.created_date), "MMM d, yyyy")}
+                            {format(
+                              new Date(payment.created_date),
+                              "MMM d, yyyy"
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -406,7 +466,7 @@ export default function PaymentSettlement() {
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => {
                       setSearchTerm("");
@@ -472,12 +532,19 @@ export default function PaymentSettlement() {
                               ₹{commission.net_amount?.toLocaleString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <Badge className={`${getCommissionStatusColor(commission.status)} border-0`}>
+                              <Badge
+                                className={`${getCommissionStatusColor(
+                                  commission.status
+                                )} border-0`}
+                              >
                                 {commission.status}
                               </Badge>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                              {format(new Date(commission.created_date), "MMM d, yyyy")}
+                              {format(
+                                new Date(commission.created_date),
+                                "MMM d, yyyy"
+                              )}
                             </td>
                           </tr>
                         );
@@ -497,22 +564,31 @@ export default function PaymentSettlement() {
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-slate-600">
-                    Process settlements for calculated commissions. This will mark them as settled and generate settlement reports.
+                    Process settlements for calculated commissions. This will
+                    mark them as settled and generate settlement reports.
                   </p>
                   <Button
                     onClick={() => {
                       const pendingCommissions = commissions
-                        .filter(c => c.status === "calculated")
-                        .map(c => c.id);
+                        .filter((c) => c.status === "calculated")
+                        .map((c) => c.id);
                       if (pendingCommissions.length > 0) {
                         processSettlement(pendingCommissions);
                       }
                     }}
-                    disabled={commissions.filter(c => c.status === "calculated").length === 0}
+                    disabled={
+                      commissions.filter((c) => c.status === "calculated")
+                        .length === 0
+                    }
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <Banknote className="w-4 h-4 mr-2" />
-                    Process All Settlements ({commissions.filter(c => c.status === "calculated").length})
+                    Process All Settlements (
+                    {
+                      commissions.filter((c) => c.status === "calculated")
+                        .length
+                    }
+                    )
                   </Button>
                 </div>
               </CardContent>

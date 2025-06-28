@@ -1,22 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { Vehicle } from "@/api/entities";
-import { User } from "@/api/entities";
+import { Vehicle, User } from "@/api/entities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { 
-  Car, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Car,
+  Plus,
+  Edit,
+  Trash2,
   Fuel,
   Calendar,
   Hash,
-  Palette
+  Palette,
 } from "lucide-react";
 
 export default function MyVehicles() {
@@ -36,7 +47,7 @@ export default function MyVehicles() {
     engine_number: "",
     chassis_number: "",
     color: "",
-    mileage: 0
+    mileage: 0,
   });
 
   useEffect(() => {
@@ -47,7 +58,7 @@ export default function MyVehicles() {
     try {
       const userData = await User.me();
       setUser(userData);
-      
+
       const userVehicles = await Vehicle.filter({ owner_id: userData.id });
       setVehicles(userVehicles);
     } catch (error) {
@@ -59,11 +70,11 @@ export default function MyVehicles() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const vehicleData = {
         ...formData,
-        owner_id: user.id
+        owner_id: user.id,
       };
 
       if (editingVehicle) {
@@ -93,7 +104,7 @@ export default function MyVehicles() {
       engine_number: "",
       chassis_number: "",
       color: "",
-      mileage: 0
+      mileage: 0,
     });
   };
 
@@ -116,10 +127,14 @@ export default function MyVehicles() {
 
   const getVehicleTypeIcon = (type) => {
     switch (type) {
-      case "2W": return "🏍️";
-      case "3W": return "🛺";
-      case "4W": return "🚗";
-      default: return "🚙";
+      case "2W":
+        return "🏍️";
+      case "3W":
+        return "🛺";
+      case "4W":
+        return "🚗";
+      default:
+        return "🚙";
     }
   };
 
@@ -128,7 +143,7 @@ export default function MyVehicles() {
       petrol: "bg-red-100 text-red-800",
       diesel: "bg-blue-100 text-blue-800",
       cng: "bg-green-100 text-green-800",
-      electric: "bg-purple-100 text-purple-800"
+      electric: "bg-purple-100 text-purple-800",
     };
     return colors[fuelType] || "bg-gray-100 text-gray-800";
   };
@@ -151,11 +166,13 @@ export default function MyVehicles() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">My Vehicles</h1>
-            <p className="text-slate-600 mt-1">Manage your registered vehicles</p>
+            <p className="text-slate-600 mt-1">
+              Manage your registered vehicles
+            </p>
           </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
-              <Button 
+              <Button
                 onClick={() => {
                   resetForm();
                   setEditingVehicle(null);
@@ -178,7 +195,12 @@ export default function MyVehicles() {
                     <Label htmlFor="vehicle_type">Vehicle Type</Label>
                     <Select
                       value={formData.vehicle_type}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, vehicle_type: value }))}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          vehicle_type: value,
+                        }))
+                      }
                       required
                     >
                       <SelectTrigger>
@@ -195,7 +217,9 @@ export default function MyVehicles() {
                     <Label htmlFor="fuel_type">Fuel Type</Label>
                     <Select
                       value={formData.fuel_type}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, fuel_type: value }))}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, fuel_type: value }))
+                      }
                       required
                     >
                       <SelectTrigger>
@@ -217,7 +241,12 @@ export default function MyVehicles() {
                     <Input
                       id="make"
                       value={formData.make}
-                      onChange={(e) => setFormData(prev => ({ ...prev, make: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          make: e.target.value,
+                        }))
+                      }
                       placeholder="e.g., Maruti Suzuki"
                       required
                     />
@@ -227,7 +256,12 @@ export default function MyVehicles() {
                     <Input
                       id="model"
                       value={formData.model}
-                      onChange={(e) => setFormData(prev => ({ ...prev, model: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          model: e.target.value,
+                        }))
+                      }
                       placeholder="e.g., Swift"
                       required
                     />
@@ -243,7 +277,12 @@ export default function MyVehicles() {
                       min="1980"
                       max={new Date().getFullYear()}
                       value={formData.year}
-                      onChange={(e) => setFormData(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          year: parseInt(e.target.value),
+                        }))
+                      }
                       required
                     />
                   </div>
@@ -252,18 +291,30 @@ export default function MyVehicles() {
                     <Input
                       id="color"
                       value={formData.color}
-                      onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          color: e.target.value,
+                        }))
+                      }
                       placeholder="e.g., Pearl White"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="registration_number">Registration Number</Label>
+                  <Label htmlFor="registration_number">
+                    Registration Number
+                  </Label>
                   <Input
                     id="registration_number"
                     value={formData.registration_number}
-                    onChange={(e) => setFormData(prev => ({ ...prev, registration_number: e.target.value.toUpperCase() }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        registration_number: e.target.value.toUpperCase(),
+                      }))
+                    }
                     placeholder="e.g., MH12AB1234"
                     required
                   />
@@ -275,7 +326,12 @@ export default function MyVehicles() {
                     <Input
                       id="engine_number"
                       value={formData.engine_number}
-                      onChange={(e) => setFormData(prev => ({ ...prev, engine_number: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          engine_number: e.target.value,
+                        }))
+                      }
                       placeholder="Engine number"
                     />
                   </div>
@@ -284,7 +340,12 @@ export default function MyVehicles() {
                     <Input
                       id="chassis_number"
                       value={formData.chassis_number}
-                      onChange={(e) => setFormData(prev => ({ ...prev, chassis_number: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          chassis_number: e.target.value,
+                        }))
+                      }
                       placeholder="Chassis number"
                     />
                   </div>
@@ -297,7 +358,12 @@ export default function MyVehicles() {
                     type="number"
                     min="0"
                     value={formData.mileage}
-                    onChange={(e) => setFormData(prev => ({ ...prev, mileage: parseInt(e.target.value) }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        mileage: parseInt(e.target.value),
+                      }))
+                    }
                     placeholder="Current odometer reading"
                   />
                 </div>
@@ -316,7 +382,11 @@ export default function MyVehicles() {
                     disabled={isSubmitting}
                     className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                   >
-                    {isSubmitting ? "Saving..." : (editingVehicle ? "Update" : "Add Vehicle")}
+                    {isSubmitting
+                      ? "Saving..."
+                      : editingVehicle
+                      ? "Update"
+                      : "Add Vehicle"}
                   </Button>
                 </div>
               </form>
@@ -329,8 +399,12 @@ export default function MyVehicles() {
           <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-12 text-center">
               <Car className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Vehicles Added</h3>
-              <p className="text-slate-600 mb-6">Add your first vehicle to start booking services</p>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No Vehicles Added
+              </h3>
+              <p className="text-slate-600 mb-6">
+                Add your first vehicle to start booking services
+              </p>
               <Button
                 onClick={() => setShowAddDialog(true)}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
@@ -343,10 +417,15 @@ export default function MyVehicles() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((vehicle) => (
-              <Card key={vehicle.id} className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card
+                key={vehicle.id}
+                className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+              >
                 <CardHeader className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="text-4xl">{getVehicleTypeIcon(vehicle.vehicle_type)}</div>
+                    <div className="text-4xl">
+                      {getVehicleTypeIcon(vehicle.vehicle_type)}
+                    </div>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
@@ -373,7 +452,11 @@ export default function MyVehicles() {
                     <Badge className="bg-slate-100 text-slate-700 border-0">
                       {vehicle.vehicle_type}
                     </Badge>
-                    <Badge className={`${getFuelTypeColor(vehicle.fuel_type)} border-0`}>
+                    <Badge
+                      className={`${getFuelTypeColor(
+                        vehicle.fuel_type
+                      )} border-0`}
+                    >
                       {vehicle.fuel_type}
                     </Badge>
                   </div>
@@ -382,7 +465,9 @@ export default function MyVehicles() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <Hash className="w-4 h-4 text-slate-400" />
-                      <span className="font-medium">{vehicle.registration_number}</span>
+                      <span className="font-medium">
+                        {vehicle.registration_number}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="w-4 h-4 text-slate-400" />

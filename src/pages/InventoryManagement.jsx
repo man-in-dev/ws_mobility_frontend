@@ -5,19 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { 
-  Package, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Package,
+  Plus,
+  Edit,
+  Trash2,
   Search,
   Filter,
   AlertTriangle,
   CheckCircle2,
-  XCircle
+  XCircle,
 } from "lucide-react";
 
 export default function InventoryManagement() {
@@ -43,7 +55,7 @@ export default function InventoryManagement() {
     minimum_stock: 0,
     unit_of_measure: "piece",
     warranty_period: 0,
-    is_active: true
+    is_active: true,
   });
 
   useEffect(() => {
@@ -63,7 +75,7 @@ export default function InventoryManagement() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       if (editingItem) {
         await Inventory.update(editingItem.id, formData);
@@ -96,7 +108,7 @@ export default function InventoryManagement() {
       minimum_stock: 0,
       unit_of_measure: "piece",
       warranty_period: 0,
-      is_active: true
+      is_active: true,
     });
   };
 
@@ -127,8 +139,16 @@ export default function InventoryManagement() {
   };
 
   const categories = [
-    "engine_parts", "brake_parts", "electrical", "body_parts", "filters", 
-    "oils_lubricants", "batteries", "tires", "tools", "accessories"
+    "engine_parts",
+    "brake_parts",
+    "electrical",
+    "body_parts",
+    "filters",
+    "oils_lubricants",
+    "batteries",
+    "tires",
+    "tools",
+    "accessories",
   ];
 
   const vehicleTypes = ["2W", "3W", "4W"];
@@ -144,7 +164,7 @@ export default function InventoryManagement() {
     const colors = {
       out_of_stock: "bg-red-100 text-red-800",
       low_stock: "bg-yellow-100 text-yellow-800",
-      in_stock: "bg-green-100 text-green-800"
+      in_stock: "bg-green-100 text-green-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -162,11 +182,13 @@ export default function InventoryManagement() {
     }
   };
 
-  const filteredInventory = inventory.filter(item => {
-    const matchesSearch = item.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.item_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.brand.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+  const filteredInventory = inventory.filter((item) => {
+    const matchesSearch =
+      item.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.item_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || item.category === categoryFilter;
     const stockStatus = getStockStatus(item);
     const matchesStock = stockFilter === "all" || stockStatus === stockFilter;
     return matchesSearch && matchesCategory && matchesStock;
@@ -189,12 +211,16 @@ export default function InventoryManagement() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Inventory Management</h1>
-            <p className="text-slate-600 mt-1">Manage spare parts and tools inventory</p>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Inventory Management
+            </h1>
+            <p className="text-slate-600 mt-1">
+              Manage spare parts and tools inventory
+            </p>
           </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
-              <Button 
+              <Button
                 onClick={() => {
                   resetForm();
                   setEditingItem(null);
@@ -218,7 +244,12 @@ export default function InventoryManagement() {
                     <Input
                       id="item_name"
                       value={formData.item_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, item_name: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          item_name: e.target.value,
+                        }))
+                      }
                       placeholder="Item name"
                       required
                     />
@@ -228,7 +259,12 @@ export default function InventoryManagement() {
                     <Input
                       id="item_code"
                       value={formData.item_code}
-                      onChange={(e) => setFormData(prev => ({ ...prev, item_code: e.target.value.toUpperCase() }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          item_code: e.target.value.toUpperCase(),
+                        }))
+                      }
                       placeholder="Unique item code"
                       required
                     />
@@ -240,7 +276,9 @@ export default function InventoryManagement() {
                     <Label htmlFor="category">Category</Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, category: value }))
+                      }
                       required
                     >
                       <SelectTrigger>
@@ -249,7 +287,9 @@ export default function InventoryManagement() {
                       <SelectContent>
                         {categories.map((category) => (
                           <SelectItem key={category} value={category}>
-                            {category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            {category
+                              .replace(/_/g, " ")
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -260,7 +300,12 @@ export default function InventoryManagement() {
                     <Input
                       id="subcategory"
                       value={formData.subcategory}
-                      onChange={(e) => setFormData(prev => ({ ...prev, subcategory: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          subcategory: e.target.value,
+                        }))
+                      }
                       placeholder="Subcategory"
                     />
                   </div>
@@ -269,7 +314,12 @@ export default function InventoryManagement() {
                     <Input
                       id="brand"
                       value={formData.brand}
-                      onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          brand: e.target.value,
+                        }))
+                      }
                       placeholder="Brand name"
                     />
                   </div>
@@ -280,7 +330,12 @@ export default function InventoryManagement() {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     placeholder="Item description"
                     className="h-20"
                   />
@@ -296,14 +351,20 @@ export default function InventoryManagement() {
                           checked={formData.compatible_vehicles.includes(type)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setFormData(prev => ({
+                              setFormData((prev) => ({
                                 ...prev,
-                                compatible_vehicles: [...prev.compatible_vehicles, type]
+                                compatible_vehicles: [
+                                  ...prev.compatible_vehicles,
+                                  type,
+                                ],
                               }));
                             } else {
-                              setFormData(prev => ({
+                              setFormData((prev) => ({
                                 ...prev,
-                                compatible_vehicles: prev.compatible_vehicles.filter(v => v !== type)
+                                compatible_vehicles:
+                                  prev.compatible_vehicles.filter(
+                                    (v) => v !== type
+                                  ),
                               }));
                             }
                           }}
@@ -324,7 +385,12 @@ export default function InventoryManagement() {
                       min="0"
                       step="0.01"
                       value={formData.unit_price}
-                      onChange={(e) => setFormData(prev => ({ ...prev, unit_price: parseFloat(e.target.value) }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          unit_price: parseFloat(e.target.value),
+                        }))
+                      }
                       required
                     />
                   </div>
@@ -336,7 +402,12 @@ export default function InventoryManagement() {
                       min="0"
                       step="0.01"
                       value={formData.mrp}
-                      onChange={(e) => setFormData(prev => ({ ...prev, mrp: parseFloat(e.target.value) }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          mrp: parseFloat(e.target.value),
+                        }))
+                      }
                     />
                   </div>
                 </div>
@@ -349,7 +420,12 @@ export default function InventoryManagement() {
                       type="number"
                       min="0"
                       value={formData.stock_quantity}
-                      onChange={(e) => setFormData(prev => ({ ...prev, stock_quantity: parseInt(e.target.value) }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          stock_quantity: parseInt(e.target.value),
+                        }))
+                      }
                       required
                     />
                   </div>
@@ -360,14 +436,24 @@ export default function InventoryManagement() {
                       type="number"
                       min="0"
                       value={formData.minimum_stock}
-                      onChange={(e) => setFormData(prev => ({ ...prev, minimum_stock: parseInt(e.target.value) }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          minimum_stock: parseInt(e.target.value),
+                        }))
+                      }
                     />
                   </div>
                   <div>
                     <Label htmlFor="unit_of_measure">Unit of Measure</Label>
                     <Select
                       value={formData.unit_of_measure}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, unit_of_measure: value }))}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          unit_of_measure: value,
+                        }))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -384,13 +470,20 @@ export default function InventoryManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="warranty_period">Warranty Period (months)</Label>
+                  <Label htmlFor="warranty_period">
+                    Warranty Period (months)
+                  </Label>
                   <Input
                     id="warranty_period"
                     type="number"
                     min="0"
                     value={formData.warranty_period}
-                    onChange={(e) => setFormData(prev => ({ ...prev, warranty_period: parseInt(e.target.value) }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        warranty_period: parseInt(e.target.value),
+                      }))
+                    }
                   />
                 </div>
 
@@ -408,7 +501,11 @@ export default function InventoryManagement() {
                     disabled={isSubmitting}
                     className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                   >
-                    {isSubmitting ? "Saving..." : (editingItem ? "Update" : "Add Item")}
+                    {isSubmitting
+                      ? "Saving..."
+                      : editingItem
+                      ? "Update"
+                      : "Add Item"}
                   </Button>
                 </div>
               </form>
@@ -437,7 +534,9 @@ export default function InventoryManagement() {
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
-                      {category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {category
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -453,7 +552,7 @@ export default function InventoryManagement() {
                   <SelectItem value="out_of_stock">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
@@ -474,12 +573,13 @@ export default function InventoryManagement() {
           <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-12 text-center">
               <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Items Found</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No Items Found
+              </h3>
               <p className="text-slate-600 mb-6">
-                {inventory.length === 0 
+                {inventory.length === 0
                   ? "Start by adding your first inventory item"
-                  : "No items match your current filters"
-                }
+                  : "No items match your current filters"}
               </p>
               <Button
                 onClick={() => setShowAddDialog(true)}
@@ -495,21 +595,32 @@ export default function InventoryManagement() {
             {filteredInventory.map((item) => {
               const stockStatus = getStockStatus(item);
               return (
-                <Card key={item.id} className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+                <Card
+                  key={item.id}
+                  className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                >
                   <CardHeader className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
                         <CardTitle className="text-lg font-bold text-slate-900 mb-2">
                           {item.item_name}
                         </CardTitle>
-                        <p className="text-sm text-slate-600 mb-2">{item.item_code}</p>
+                        <p className="text-sm text-slate-600 mb-2">
+                          {item.item_code}
+                        </p>
                         <div className="flex gap-2 mb-2">
                           <Badge className="bg-slate-100 text-slate-700 border-0 text-xs">
-                            {item.category.replace(/_/g, ' ')}
+                            {item.category.replace(/_/g, " ")}
                           </Badge>
-                          <Badge className={`${getStockStatusColor(stockStatus)} border-0 text-xs`}>
+                          <Badge
+                            className={`${getStockStatusColor(
+                              stockStatus
+                            )} border-0 text-xs`}
+                          >
                             {getStockStatusIcon(stockStatus)}
-                            <span className="ml-1">{stockStatus.replace(/_/g, ' ')}</span>
+                            <span className="ml-1">
+                              {stockStatus.replace(/_/g, " ")}
+                            </span>
                           </Badge>
                         </div>
                       </div>
@@ -542,22 +653,38 @@ export default function InventoryManagement() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-slate-600">Price:</span>
                         <div className="text-right">
-                          <span className="font-bold text-lg">₹{item.unit_price}</span>
+                          <span className="font-bold text-lg">
+                            ₹{item.unit_price}
+                          </span>
                           {item.mrp > item.unit_price && (
-                            <span className="text-xs text-slate-500 line-through ml-2">₹{item.mrp}</span>
+                            <span className="text-xs text-slate-500 line-through ml-2">
+                              ₹{item.mrp}
+                            </span>
                           )}
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-slate-600">Stock:</span>
-                        <span className={`font-medium ${stockStatus === 'out_of_stock' ? 'text-red-600' : stockStatus === 'low_stock' ? 'text-yellow-600' : 'text-green-600'}`}>
+                        <span
+                          className={`font-medium ${
+                            stockStatus === "out_of_stock"
+                              ? "text-red-600"
+                              : stockStatus === "low_stock"
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                          }`}
+                        >
                           {item.stock_quantity} {item.unit_of_measure}
                         </span>
                       </div>
                       {item.compatible_vehicles?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {item.compatible_vehicles.map((vehicle) => (
-                            <Badge key={vehicle} variant="outline" className="text-xs">
+                            <Badge
+                              key={vehicle}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {vehicle}
                             </Badge>
                           ))}
@@ -566,7 +693,9 @@ export default function InventoryManagement() {
                     </div>
                     <div className="mt-4 pt-4 border-t border-slate-200">
                       <Button
-                        onClick={() => toggleActiveStatus(item.id, item.is_active)}
+                        onClick={() =>
+                          toggleActiveStatus(item.id, item.is_active)
+                        }
                         variant={item.is_active ? "outline" : "default"}
                         size="sm"
                         className="w-full"

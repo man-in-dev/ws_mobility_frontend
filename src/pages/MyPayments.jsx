@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Payment } from "@/api/entities";
 import { Commission } from "@/api/entities";
@@ -10,7 +9,7 @@ import {
   CreditCard,
   IndianRupee, // Changed from DollarSign to IndianRupee
   TrendingDown,
-  Banknote
+  Banknote,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -22,7 +21,7 @@ export default function MyPayments() {
   const [stats, setStats] = useState({
     totalEarnings: 0,
     totalCommissions: 0,
-    netPayout: 0
+    netPayout: 0,
   });
 
   useEffect(() => {
@@ -35,23 +34,30 @@ export default function MyPayments() {
       setUser(userData);
 
       const [userPayments, userCommissions] = await Promise.all([
-        Payment.filter({ payee_id: userData.id }, "-created_date"),
-        Commission.filter({ user_id: userData.id }, "-created_date")
+        Payment.list(),
+        // .filter({ payee_id: userData.id }, "-created_date"),
+        Commission.list(),
+        // .filter({ user_id: userData.id }, "-created_date")
       ]);
 
       setPayments(userPayments);
       setCommissions(userCommissions);
 
       // Calculate statistics
-      const totalEarnings = userPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-      const totalCommissions = userCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
+      const totalEarnings = userPayments.reduce(
+        (sum, p) => sum + (p.amount || 0),
+        0
+      );
+      const totalCommissions = userCommissions.reduce(
+        (sum, c) => sum + (c.commission_amount || 0),
+        0
+      );
 
       setStats({
         totalEarnings,
         totalCommissions,
-        netPayout: totalEarnings - totalCommissions
+        netPayout: totalEarnings - totalCommissions,
       });
-
     } catch (error) {
       console.error("Error loading payment data:", error);
     }
@@ -93,7 +99,9 @@ export default function MyPayments() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">My Payments</h1>
-          <p className="text-slate-600 mt-1">Review your earnings, commissions, and settlements</p>
+          <p className="text-slate-600 mt-1">
+            Review your earnings, commissions, and settlements
+          </p>
         </div>
 
         {/* Stats Cards */}
@@ -102,11 +110,16 @@ export default function MyPayments() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Total Earnings</p>
-                  <p className="text-2xl font-bold text-slate-900">₹{stats.totalEarnings.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Total Earnings
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ₹{stats.totalEarnings.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-lg">
-                  <IndianRupee className="w-6 h-6 text-green-600" /> {/* Changed icon to IndianRupee */}
+                  <IndianRupee className="w-6 h-6 text-green-600" />{" "}
+                  {/* Changed icon to IndianRupee */}
                 </div>
               </div>
             </CardContent>
@@ -116,8 +129,12 @@ export default function MyPayments() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Platform Commissions</p>
-                  <p className="text-2xl font-bold text-slate-900">₹{stats.totalCommissions.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Platform Commissions
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ₹{stats.totalCommissions.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-red-100 rounded-lg">
                   <TrendingDown className="w-6 h-6 text-red-600" />
@@ -130,8 +147,12 @@ export default function MyPayments() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Net Payout</p>
-                  <p className="text-2xl font-bold text-slate-900">₹{stats.netPayout.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-slate-500">
+                    Net Payout
+                  </p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    ₹{stats.netPayout.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-lg">
                   <Banknote className="w-6 h-6 text-blue-600" />
@@ -151,30 +172,53 @@ export default function MyPayments() {
               <TabsList className="bg-slate-100">
                 <TabsTrigger value="all">All Transactions</TabsTrigger>
                 <TabsTrigger value="payments">Payments Received</TabsTrigger>
-                <TabsTrigger value="commissions">Commissions Deducted</TabsTrigger>
+                <TabsTrigger value="commissions">
+                  Commissions Deducted
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="mt-4">
-                 <div className="overflow-x-auto">
+                <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-slate-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Description</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Description
+                        </th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Amount
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
                       {[...payments, ...commissions]
-                        .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+                        .sort(
+                          (a, b) =>
+                            new Date(b.created_date) - new Date(a.created_date)
+                        )
                         .map((tx) => (
                           <tr key={tx.id}>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-600">{format(new Date(tx.created_date), 'MMM d, yyyy')}</td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
-                              {tx.payment_id ? `Payment for Order #${tx.order_id}` : `Commission for ${tx.transaction_type} #${tx.transaction_id}`}
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-600">
+                              {format(new Date(tx.created_date), "MMM d, yyyy")}
                             </td>
-                            <td className={`px-4 py-4 whitespace-nowrap text-sm text-right font-medium ${tx.payment_id ? 'text-green-600' : 'text-red-600'}`}>
-                              {tx.payment_id ? `+₹${tx.amount.toLocaleString()}` : `-₹${tx.commission_amount.toLocaleString()}`}
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                              {tx.payment_id
+                                ? `Payment for Order #${tx.order_id}`
+                                : `Commission for ${tx.transaction_type} #${tx.transaction_id}`}
+                            </td>
+                            <td
+                              className={`px-4 py-4 whitespace-nowrap text-sm text-right font-medium ${
+                                tx.payment_id
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {tx.payment_id
+                                ? `+₹${tx.amount.toLocaleString()}`
+                                : `-₹${tx.commission_amount.toLocaleString()}`}
                             </td>
                           </tr>
                         ))}
@@ -184,23 +228,45 @@ export default function MyPayments() {
               </TabsContent>
 
               <TabsContent value="payments" className="mt-4">
-                 <div className="overflow-x-auto">
+                <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-slate-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Order ID</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Order ID
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Amount
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
-                      {payments.map(p => (
+                      {payments.map((p) => (
                         <tr key={p.id}>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-600">{format(new Date(p.created_date), 'MMM d, yyyy')}</td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{p.order_id}</td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm"><Badge className={getPaymentStatusColor(p.payment_status)}>{p.payment_status}</Badge></td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">₹{p.amount.toLocaleString()}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {format(new Date(p.created_date), "MMM d, yyyy")}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {p.order_id}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            <Badge
+                              className={getPaymentStatusColor(
+                                p.payment_status
+                              )}
+                            >
+                              {p.payment_status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">
+                            ₹{p.amount.toLocaleString()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -209,23 +275,43 @@ export default function MyPayments() {
               </TabsContent>
 
               <TabsContent value="commissions" className="mt-4">
-                 <div className="overflow-x-auto">
+                <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-slate-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Transaction</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Transaction
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Amount
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
-                       {commissions.map(c => (
+                      {commissions.map((c) => (
                         <tr key={c.id}>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-600">{format(new Date(c.created_date), 'MMM d, yyyy')}</td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">{c.transaction_type} #{c.transaction_id}</td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm"><Badge className={getCommissionStatusColor(c.status)}>{c.status}</Badge></td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-red-600">₹{c.commission_amount.toLocaleString()}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {format(new Date(c.created_date), "MMM d, yyyy")}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {c.transaction_type} #{c.transaction_id}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            <Badge
+                              className={getCommissionStatusColor(c.status)}
+                            >
+                              {c.status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right font-medium text-red-600">
+                            ₹{c.commission_amount.toLocaleString()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

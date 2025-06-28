@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { ServiceRequest } from "@/api/entities";
-import { Vehicle } from "@/api/entities";
-import { User } from "@/api/entities";
+import { ServiceRequest, Vehicle, User } from "@/api/entities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { 
-  Wrench, 
-  Calendar, 
-  MapPin, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Wrench,
+  Calendar,
+  MapPin,
   IndianRupee,
   User as UserIcon,
   Phone,
@@ -24,7 +33,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Star
+  Star,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -41,7 +50,7 @@ export default function MyServices() {
   const [updateFormData, setUpdateFormData] = useState({
     status: "",
     actual_cost: 0,
-    notes: ""
+    notes: "",
   });
 
   useEffect(() => {
@@ -52,21 +61,25 @@ export default function MyServices() {
     try {
       const userData = await User.me();
       setUser(userData);
-      
+
       const [allServices, allUsers, allVehicles] = await Promise.all([
         ServiceRequest.list("-created_date", 50),
         User.list(),
-        Vehicle.list()
+        Vehicle.list(),
       ]);
-      
-      let myServices = allServices.filter(s => s.service_provider_id === userData.id);
+
+      let myServices = allServices.filter(
+        (s) => s.service_provider_id === userData.id
+      );
 
       if (myServices.length === 0) {
         myServices = allServices.slice(0, 3); // Show 3 sample services if none are assigned
       }
-      
+
       setServices(myServices);
-      setCustomers(allUsers.filter(user => user.user_type === "vehicle_owner"));
+      setCustomers(
+        allUsers.filter((user) => user.user_type === "vehicle_owner")
+      );
       setVehicles(allVehicles);
     } catch (error) {
       console.error("Error loading services:", error);
@@ -81,7 +94,7 @@ export default function MyServices() {
     try {
       const updateData = {
         status: updateFormData.status,
-        notes: updateFormData.notes
+        notes: updateFormData.notes,
       };
 
       if (updateFormData.actual_cost > 0) {
@@ -94,7 +107,7 @@ export default function MyServices() {
       }
 
       await ServiceRequest.update(selectedService.id, updateData);
-      
+
       setShowUpdateDialog(false);
       setSelectedService(null);
       setUpdateFormData({ status: "", actual_cost: 0, notes: "" });
@@ -124,7 +137,7 @@ export default function MyServices() {
       assigned: "bg-blue-100 text-blue-800",
       in_progress: "bg-purple-100 text-purple-800",
       completed: "bg-green-100 text-green-800",
-      cancelled: "bg-red-100 text-red-800"
+      cancelled: "bg-red-100 text-red-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -134,36 +147,49 @@ export default function MyServices() {
       low: "bg-green-100 text-green-800",
       medium: "bg-yellow-100 text-yellow-800",
       high: "bg-orange-100 text-orange-800",
-      emergency: "bg-red-100 text-red-800"
+      emergency: "bg-red-100 text-red-800",
     };
     return colors[priority] || "bg-gray-100 text-gray-800";
   };
 
   const getCustomerInfo = (customerId) => {
-    const customer = customers.find(c => c.id === customerId);
-    return customer || { full_name: "Sample Customer", email: "", phone: "9876543210" };
+    const customer = customers.find((c) => c.id === customerId);
+    return (
+      customer || {
+        full_name: "Sample Customer",
+        email: "",
+        phone: "9876543210",
+      }
+    );
   };
 
   const getVehicleInfo = (vehicleId) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "Sample Vehicle (MH-01-AB-1234)";
+    const vehicle = vehicles.find((v) => v.id === vehicleId);
+    return vehicle
+      ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})`
+      : "Sample Vehicle (MH-01-AB-1234)";
   };
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`w-4 h-4 ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+        className={`w-4 h-4 ${
+          i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+        }`}
       />
     ));
   };
 
-  const filteredServices = services.filter(service => {
+  const filteredServices = services.filter((service) => {
     const customer = getCustomerInfo(service.customer_id);
-    const matchesSearch = service.service_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         customer.full_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || service.status === statusFilter;
+    const matchesSearch =
+      service.service_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (service.description &&
+        service.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      customer.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || service.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -184,7 +210,9 @@ export default function MyServices() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">My Services</h1>
-          <p className="text-slate-600 mt-1">Manage your assigned service requests</p>
+          <p className="text-slate-600 mt-1">
+            Manage your assigned service requests
+          </p>
         </div>
 
         {/* Filters */}
@@ -212,7 +240,7 @@ export default function MyServices() {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
@@ -232,12 +260,13 @@ export default function MyServices() {
           <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-12 text-center">
               <Wrench className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Services Found</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No Services Found
+              </h3>
               <p className="text-slate-600">
-                {services.length === 0 
+                {services.length === 0
                   ? "You don't have any assigned services yet"
-                  : "No services match your current filters"
-                }
+                  : "No services match your current filters"}
               </p>
             </CardContent>
           </Card>
@@ -245,16 +274,23 @@ export default function MyServices() {
           <div className="space-y-6">
             {filteredServices.map((service) => {
               const customer = getCustomerInfo(service.customer_id);
-              
+
               return (
-                <Card key={service.id} className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+                <Card
+                  key={service.id}
+                  className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4">
                       <div>
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                          {service.service_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {service.service_type
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </h3>
-                        <p className="text-slate-600 mb-2">{getVehicleInfo(service.vehicle_id)}</p>
+                        <p className="text-slate-600 mb-2">
+                          {getVehicleInfo(service.vehicle_id)}
+                        </p>
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <UserIcon className="w-4 h-4" />
                           <span>{customer.full_name}</span>
@@ -267,11 +303,21 @@ export default function MyServices() {
                         </div>
                       </div>
                       <div className="flex gap-2 mt-4 lg:mt-0">
-                        <Badge className={`${getStatusColor(service.status)} border-0`}>
+                        <Badge
+                          className={`${getStatusColor(
+                            service.status
+                          )} border-0`}
+                        >
                           {getStatusIcon(service.status)}
-                          <span className="ml-1">{service.status.replace(/_/g, ' ')}</span>
+                          <span className="ml-1">
+                            {service.status.replace(/_/g, " ")}
+                          </span>
                         </Badge>
-                        <Badge className={`${getPriorityColor(service.priority)} border-0`}>
+                        <Badge
+                          className={`${getPriorityColor(
+                            service.priority
+                          )} border-0`}
+                        >
                           {service.priority}
                         </Badge>
                       </div>
@@ -281,46 +327,60 @@ export default function MyServices() {
                       <div className="flex items-center gap-2 text-sm text-slate-600">
                         <Calendar className="w-4 h-4" />
                         <span>
-                          {service.scheduled_date 
-                            ? format(new Date(service.scheduled_date), "MMM d, yyyy")
-                            : "Not scheduled"
-                          }
+                          {service.scheduled_date
+                            ? format(
+                                new Date(service.scheduled_date),
+                                "MMM d, yyyy"
+                              )
+                            : "Not scheduled"}
                         </span>
                       </div>
                       {service.location?.address && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <MapPin className="w-4 h-4" />
-                          <span className="truncate">{service.location.address}</span>
+                          <span className="truncate">
+                            {service.location.address}
+                          </span>
                         </div>
                       )}
                       {service.estimated_cost && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <IndianRupee className="w-4 h-4" />
-                          <span>Est: ₹{service.estimated_cost.toLocaleString()}</span>
+                          <span>
+                            Est: ₹{service.estimated_cost.toLocaleString()}
+                          </span>
                         </div>
                       )}
                       {service.actual_cost && (
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <IndianRupee className="w-4 h-4" />
-                          <span>Actual: ₹{service.actual_cost.toLocaleString()}</span>
+                          <span>
+                            Actual: ₹{service.actual_cost.toLocaleString()}
+                          </span>
                         </div>
                       )}
                     </div>
 
                     <div className="bg-slate-50 rounded-lg p-4 mb-4">
-                      <p className="text-sm text-slate-700">{service.description}</p>
+                      <p className="text-sm text-slate-700">
+                        {service.description}
+                      </p>
                     </div>
 
                     {service.status === "completed" && service.rating && (
                       <div className="bg-green-50 rounded-lg p-4 mb-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm font-medium text-green-800">Customer Rating:</span>
+                          <span className="text-sm font-medium text-green-800">
+                            Customer Rating:
+                          </span>
                           <div className="flex items-center gap-1">
                             {renderStars(service.rating)}
                           </div>
                         </div>
                         {service.feedback && (
-                          <p className="text-sm text-green-700">"{service.feedback}"</p>
+                          <p className="text-sm text-green-700">
+                            "{service.feedback}"
+                          </p>
                         )}
                       </div>
                     )}
@@ -330,7 +390,11 @@ export default function MyServices() {
                         <Button
                           onClick={() => {
                             setSelectedService(service);
-                            setUpdateFormData({ status: "in_progress", actual_cost: service.estimated_cost || 0, notes: "" });
+                            setUpdateFormData({
+                              status: "in_progress",
+                              actual_cost: service.estimated_cost || 0,
+                              notes: "",
+                            });
                             setShowUpdateDialog(true);
                           }}
                           size="sm"
@@ -339,12 +403,16 @@ export default function MyServices() {
                           Start Service
                         </Button>
                       )}
-                      
+
                       {service.status === "in_progress" && (
                         <Button
                           onClick={() => {
                             setSelectedService(service);
-                            setUpdateFormData({ status: "completed", actual_cost: service.estimated_cost || 0, notes: "" });
+                            setUpdateFormData({
+                              status: "completed",
+                              actual_cost: service.estimated_cost || 0,
+                              notes: "",
+                            });
                             setShowUpdateDialog(true);
                           }}
                           size="sm"
@@ -353,12 +421,20 @@ export default function MyServices() {
                           Complete Service
                         </Button>
                       )}
-                      
-                      {(service.status === "assigned" || service.status === "in_progress") && (
+
+                      {(service.status === "assigned" ||
+                        service.status === "in_progress") && (
                         <Button
                           onClick={() => {
                             setSelectedService(service);
-                            setUpdateFormData({ status: service.status, actual_cost: service.actual_cost || service.estimated_cost || 0, notes: "" });
+                            setUpdateFormData({
+                              status: service.status,
+                              actual_cost:
+                                service.actual_cost ||
+                                service.estimated_cost ||
+                                0,
+                              notes: "",
+                            });
                             setShowUpdateDialog(true);
                           }}
                           size="sm"
@@ -389,7 +465,9 @@ export default function MyServices() {
                 </label>
                 <Select
                   value={updateFormData.status}
-                  onValueChange={(value) => setUpdateFormData(prev => ({ ...prev, status: value }))}
+                  onValueChange={(value) =>
+                    setUpdateFormData((prev) => ({ ...prev, status: value }))
+                  }
                   required
                 >
                   <SelectTrigger>
@@ -402,7 +480,7 @@ export default function MyServices() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Actual Cost (₹)
@@ -412,24 +490,34 @@ export default function MyServices() {
                   min="0"
                   step="0.01"
                   value={updateFormData.actual_cost}
-                  onChange={(e) => setUpdateFormData(prev => ({ ...prev, actual_cost: parseFloat(e.target.value) }))}
+                  onChange={(e) =>
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      actual_cost: parseFloat(e.target.value),
+                    }))
+                  }
                   placeholder="Enter actual service cost"
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Notes
                 </label>
                 <Textarea
                   value={updateFormData.notes}
-                  onChange={(e) => setUpdateFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   placeholder="Any additional notes..."
                   className="h-20"
                 />
               </div>
-              
+
               <div className="flex gap-4 pt-4">
                 <Button
                   type="button"

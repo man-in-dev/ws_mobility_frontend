@@ -4,20 +4,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { 
-  Users, 
-  Plus, 
-  Edit, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Users,
+  Plus,
+  Edit,
   Search,
   Filter,
   Mail,
   Phone,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 
 export default function UserManagement() {
@@ -35,7 +47,7 @@ export default function UserManagement() {
     full_name: "",
     phone: "",
     business_name: "",
-    commission_rate: 10
+    commission_rate: 10,
   });
 
   useEffect(() => {
@@ -78,7 +90,7 @@ export default function UserManagement() {
       payment_collector: "bg-yellow-100 text-yellow-800",
       warehouse_staff: "bg-purple-100 text-purple-800",
       dispatcher: "bg-orange-100 text-orange-800",
-      insurance_agent: "bg-pink-100 text-pink-800"
+      insurance_agent: "bg-pink-100 text-pink-800",
     };
     return colors[type] || "bg-gray-100 text-gray-800";
   };
@@ -87,7 +99,7 @@ export default function UserManagement() {
     const colors = {
       active: "bg-green-100 text-green-800",
       inactive: "bg-gray-100 text-gray-800",
-      suspended: "bg-red-100 text-red-800"
+      suspended: "bg-red-100 text-red-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -103,12 +115,14 @@ export default function UserManagement() {
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.business_name?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.business_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.user_type === roleFilter;
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
   });
 
@@ -129,13 +143,26 @@ export default function UserManagement() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
-            <p className="text-slate-600 mt-1">Manage platform users and their permissions</p>
+            <h1 className="text-3xl font-bold text-slate-900">
+              User Management
+            </h1>
+            <p className="text-slate-600 mt-1">
+              Manage platform users and their permissions
+            </p>
           </div>
           <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
             <DialogTrigger asChild>
-              <Button 
-                onClick={() => setInviteFormData({ email: "", user_type: "", full_name: "", phone: "", business_name: "", commission_rate: 10 })}
+              <Button
+                onClick={() =>
+                  setInviteFormData({
+                    email: "",
+                    user_type: "",
+                    full_name: "",
+                    phone: "",
+                    business_name: "",
+                    commission_rate: 10,
+                  })
+                }
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -148,7 +175,8 @@ export default function UserManagement() {
               </DialogHeader>
               <div className="space-y-4">
                 <p className="text-sm text-slate-600">
-                  Note: This is a demo. In a real application, you would send an invitation email to the user.
+                  Note: This is a demo. In a real application, you would send an
+                  invitation email to the user.
                 </p>
                 <div>
                   <Label htmlFor="email">Email</Label>
@@ -156,7 +184,12 @@ export default function UserManagement() {
                     id="email"
                     type="email"
                     value={inviteFormData.email}
-                    onChange={(e) => setInviteFormData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setInviteFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
                     placeholder="user@example.com"
                     required
                   />
@@ -166,7 +199,12 @@ export default function UserManagement() {
                   <Input
                     id="full_name"
                     value={inviteFormData.full_name}
-                    onChange={(e) => setInviteFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                    onChange={(e) =>
+                      setInviteFormData((prev) => ({
+                        ...prev,
+                        full_name: e.target.value,
+                      }))
+                    }
                     placeholder="Full name"
                     required
                   />
@@ -175,19 +213,34 @@ export default function UserManagement() {
                   <Label htmlFor="user_type">User Role</Label>
                   <Select
                     value={inviteFormData.user_type}
-                    onValueChange={(value) => setInviteFormData(prev => ({ ...prev, user_type: value }))}
+                    onValueChange={(value) =>
+                      setInviteFormData((prev) => ({
+                        ...prev,
+                        user_type: value,
+                      }))
+                    }
                     required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="service_provider">Service Provider</SelectItem>
-                      <SelectItem value="vehicle_owner">Vehicle Owner</SelectItem>
-                      <SelectItem value="payment_collector">Payment Collector</SelectItem>
-                      <SelectItem value="warehouse_staff">Warehouse Staff</SelectItem>
+                      <SelectItem value="service_provider">
+                        Service Provider
+                      </SelectItem>
+                      <SelectItem value="vehicle_owner">
+                        Vehicle Owner
+                      </SelectItem>
+                      <SelectItem value="payment_collector">
+                        Payment Collector
+                      </SelectItem>
+                      <SelectItem value="warehouse_staff">
+                        Warehouse Staff
+                      </SelectItem>
                       <SelectItem value="dispatcher">Dispatcher</SelectItem>
-                      <SelectItem value="insurance_agent">Insurance Agent</SelectItem>
+                      <SelectItem value="insurance_agent">
+                        Insurance Agent
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -198,12 +251,19 @@ export default function UserManagement() {
                       <Input
                         id="business_name"
                         value={inviteFormData.business_name}
-                        onChange={(e) => setInviteFormData(prev => ({ ...prev, business_name: e.target.value }))}
+                        onChange={(e) =>
+                          setInviteFormData((prev) => ({
+                            ...prev,
+                            business_name: e.target.value,
+                          }))
+                        }
                         placeholder="Business name"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="commission_rate">Commission Rate (%)</Label>
+                      <Label htmlFor="commission_rate">
+                        Commission Rate (%)
+                      </Label>
                       <Input
                         id="commission_rate"
                         type="number"
@@ -211,7 +271,12 @@ export default function UserManagement() {
                         max="100"
                         step="0.1"
                         value={inviteFormData.commission_rate}
-                        onChange={(e) => setInviteFormData(prev => ({ ...prev, commission_rate: parseFloat(e.target.value) }))}
+                        onChange={(e) =>
+                          setInviteFormData((prev) => ({
+                            ...prev,
+                            commission_rate: parseFloat(e.target.value),
+                          }))
+                        }
                       />
                     </div>
                   </>
@@ -221,7 +286,12 @@ export default function UserManagement() {
                   <Input
                     id="phone"
                     value={inviteFormData.phone}
-                    onChange={(e) => setInviteFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    onChange={(e) =>
+                      setInviteFormData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
                     placeholder="Phone number"
                   />
                 </div>
@@ -268,12 +338,20 @@ export default function UserManagement() {
                 <SelectContent>
                   <SelectItem value="all">All Roles</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="service_provider">Service Provider</SelectItem>
+                  <SelectItem value="service_provider">
+                    Service Provider
+                  </SelectItem>
                   <SelectItem value="vehicle_owner">Vehicle Owner</SelectItem>
-                  <SelectItem value="payment_collector">Payment Collector</SelectItem>
-                  <SelectItem value="warehouse_staff">Warehouse Staff</SelectItem>
+                  <SelectItem value="payment_collector">
+                    Payment Collector
+                  </SelectItem>
+                  <SelectItem value="warehouse_staff">
+                    Warehouse Staff
+                  </SelectItem>
                   <SelectItem value="dispatcher">Dispatcher</SelectItem>
-                  <SelectItem value="insurance_agent">Insurance Agent</SelectItem>
+                  <SelectItem value="insurance_agent">
+                    Insurance Agent
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -287,7 +365,7 @@ export default function UserManagement() {
                   <SelectItem value="suspended">Suspended</SelectItem>
                 </SelectContent>
               </Select>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
@@ -308,14 +386,21 @@ export default function UserManagement() {
           <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-12 text-center">
               <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Users Found</h3>
-              <p className="text-slate-600">No users match your current filters</p>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No Users Found
+              </h3>
+              <p className="text-slate-600">
+                No users match your current filters
+              </p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredUsers.map((user) => (
-              <Card key={user.id} className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card
+                key={user.id}
+                className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+              >
                 <CardHeader className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
@@ -323,13 +408,23 @@ export default function UserManagement() {
                         {user.full_name}
                       </CardTitle>
                       {user.business_name && (
-                        <p className="text-sm text-slate-600 mb-2">{user.business_name}</p>
+                        <p className="text-sm text-slate-600 mb-2">
+                          {user.business_name}
+                        </p>
                       )}
                       <div className="flex gap-2 mb-2">
-                        <Badge className={`${getUserTypeColor(user.user_type)} border-0 text-xs`}>
-                          {user.user_type?.replace(/_/g, ' ')}
+                        <Badge
+                          className={`${getUserTypeColor(
+                            user.user_type
+                          )} border-0 text-xs`}
+                        >
+                          {user.user_type?.replace(/_/g, " ")}
                         </Badge>
-                        <Badge className={`${getStatusColor(user.status)} border-0 text-xs`}>
+                        <Badge
+                          className={`${getStatusColor(
+                            user.status
+                          )} border-0 text-xs`}
+                        >
                           {getStatusIcon(user.status)}
                           <span className="ml-1">{user.status}</span>
                         </Badge>
@@ -356,16 +451,20 @@ export default function UserManagement() {
                     )}
                     {user.commission_rate && (
                       <div className="text-sm text-slate-600">
-                        <span className="font-medium">Commission: {user.commission_rate}%</span>
+                        <span className="font-medium">
+                          Commission: {user.commission_rate}%
+                        </span>
                       </div>
                     )}
                     {user.city && (
                       <div className="text-sm text-slate-600">
-                        <span>{user.city}, {user.state}</span>
+                        <span>
+                          {user.city}, {user.state}
+                        </span>
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
                     <Button
                       onClick={() => toggleUserStatus(user.id, user.status)}
@@ -376,7 +475,9 @@ export default function UserManagement() {
                       {user.status === "active" ? "Suspend" : "Activate"}
                     </Button>
                     <Button
-                      onClick={() => toggleVerification(user.id, user.is_verified)}
+                      onClick={() =>
+                        toggleVerification(user.id, user.is_verified)
+                      }
                       size="sm"
                       variant={user.is_verified ? "outline" : "default"}
                       className="flex-1 text-xs"

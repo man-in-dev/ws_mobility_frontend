@@ -1,15 +1,19 @@
-
 import React, { useState, useEffect } from "react";
-import { InventoryOrder } from "@/api/entities";
-import { User } from "@/api/entities";
+import { InventoryOrder, User } from "@/api/entities";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Package, 
-  Calendar, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Package,
+  Calendar,
   IndianRupee, // Changed from DollarSign to IndianRupee
   Truck,
   Search,
@@ -17,7 +21,7 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -36,8 +40,12 @@ export default function MyOrders() {
     try {
       const userData = await User.me();
       setUser(userData);
-      
-      const userOrders = await InventoryOrder.filter({ service_provider_id: userData.id }, "-created_date");
+
+      const userOrders = await InventoryOrder.list();
+      // .filter(
+      //   { service_provider_id: userData.id },
+      //   "-created_date"
+      // );
       setOrders(userOrders);
     } catch (error) {
       console.error("Error loading orders:", error);
@@ -71,7 +79,7 @@ export default function MyOrders() {
       packed: "bg-indigo-100 text-indigo-800",
       dispatched: "bg-purple-100 text-purple-800",
       delivered: "bg-green-100 text-green-800",
-      cancelled: "bg-red-100 text-red-800"
+      cancelled: "bg-red-100 text-red-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -81,7 +89,7 @@ export default function MyOrders() {
       low: "bg-green-100 text-green-800",
       medium: "bg-yellow-100 text-yellow-800",
       high: "bg-orange-100 text-orange-800",
-      urgent: "bg-red-100 text-red-800"
+      urgent: "bg-red-100 text-red-800",
     };
     return colors[priority] || "bg-gray-100 text-gray-800";
   };
@@ -89,20 +97,52 @@ export default function MyOrders() {
   const getStatusSteps = (status) => {
     const steps = [
       { key: "pending", label: "Order Placed", completed: true },
-      { key: "approved", label: "Approved", completed: ["approved", "packed", "dispatched", "delivered"].includes(status) },
-      { key: "packed", label: "Packed", completed: ["packed", "dispatched", "delivered"].includes(status) },
-      { key: "dispatched", label: "Dispatched", completed: ["dispatched", "delivered"].includes(status) },
-      { key: "delivered", label: "Delivered", completed: status === "delivered" }
+      {
+        key: "approved",
+        label: "Approved",
+        completed: ["approved", "packed", "dispatched", "delivered"].includes(
+          status
+        ),
+      },
+      {
+        key: "packed",
+        label: "Packed",
+        completed: ["packed", "dispatched", "delivered"].includes(status),
+      },
+      {
+        key: "dispatched",
+        label: "Dispatched",
+        completed: ["dispatched", "delivered"].includes(status),
+      },
+      {
+        key: "delivered",
+        label: "Delivered",
+        completed: status === "delivered",
+      },
     ];
     return steps;
   };
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.items.some(item => item.item_name.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+      order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.items.some((item) =>
+        item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    const matchesStatus =
+      statusFilter === "all" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const getParsedValue = (value) => {
+    try {
+      const cleaned = value.replace(/""/g, '"');
+      return JSON.parse(cleaned);
+    } catch (error) {
+      console.error("Invalid value JSON:", error);
+      return {};
+    }
+  };
 
   if (isLoading) {
     return (
@@ -151,7 +191,7 @@ export default function MyOrders() {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => {
                   setSearchTerm("");
@@ -171,15 +211,16 @@ export default function MyOrders() {
           <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-12 text-center">
               <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Orders Found</h3>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                No Orders Found
+              </h3>
               <p className="text-slate-600 mb-6">
-                {orders.length === 0 
+                {orders.length === 0
                   ? "You haven't placed any orders yet"
-                  : "No orders match your current filters"
-                }
+                  : "No orders match your current filters"}
               </p>
               <Button
-                onClick={() => window.location.href = "/order-parts"}
+                onClick={() => (window.location.href = "/order-parts")}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
                 Order Parts
@@ -189,7 +230,10 @@ export default function MyOrders() {
         ) : (
           <div className="space-y-6">
             {filteredOrders.map((order) => (
-              <Card key={order.id} className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card
+                key={order.id}
+                className="bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+              >
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6">
                     <div>
@@ -199,20 +243,32 @@ export default function MyOrders() {
                       <div className="flex items-center gap-4 text-sm text-slate-600">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          <span>{format(new Date(order.created_date), "MMM d, yyyy")}</span>
+                          <span>
+                            {format(
+                              new Date(order.created_date),
+                              "MMM d, yyyy"
+                            )}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <IndianRupee className="w-4 h-4" /> {/* Changed icon to IndianRupee */}
+                          <IndianRupee className="w-4 h-4" />{" "}
+                          {/* Changed icon to IndianRupee */}
                           <span>₹{order.total_amount.toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2 mt-4 lg:mt-0">
-                      <Badge className={`${getStatusColor(order.status)} border-0`}>
+                      <Badge
+                        className={`${getStatusColor(order.status)} border-0`}
+                      >
                         {getStatusIcon(order.status)}
                         <span className="ml-1">{order.status}</span>
                       </Badge>
-                      <Badge className={`${getPriorityColor(order.priority)} border-0`}>
+                      <Badge
+                        className={`${getPriorityColor(
+                          order.priority
+                        )} border-0`}
+                      >
                         {order.priority}
                       </Badge>
                     </div>
@@ -224,17 +280,24 @@ export default function MyOrders() {
                       <div className="flex items-center justify-between mb-2">
                         {getStatusSteps(order.status).map((step, index) => (
                           <div key={step.key} className="flex items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                              step.completed 
-                                ? 'bg-green-500 text-white' 
-                                : 'bg-slate-200 text-slate-600'
-                            }`}>
-                              {step.completed ? '✓' : index + 1}
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                                step.completed
+                                  ? "bg-green-500 text-white"
+                                  : "bg-slate-200 text-slate-600"
+                              }`}
+                            >
+                              {step.completed ? "✓" : index + 1}
                             </div>
-                            {index < getStatusSteps(order.status).length - 1 && (
-                              <div className={`w-12 h-1 mx-2 ${
-                                step.completed ? 'bg-green-500' : 'bg-slate-200'
-                              }`} />
+                            {index <
+                              getStatusSteps(order.status).length - 1 && (
+                              <div
+                                className={`w-12 h-1 mx-2 ${
+                                  step.completed
+                                    ? "bg-green-500"
+                                    : "bg-slate-200"
+                                }`}
+                              />
                             )}
                           </div>
                         ))}
@@ -251,15 +314,26 @@ export default function MyOrders() {
 
                   {/* Order Items */}
                   <div className="bg-slate-50 rounded-lg p-4 mb-4">
-                    <h4 className="font-semibold text-slate-900 mb-3">Order Items</h4>
+                    <h4 className="font-semibold text-slate-900 mb-3">
+                      Order Items
+                    </h4>
                     <div className="space-y-2">
-                      {order.items.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center">
+                      {getParsedValue(order.items[0]).map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center"
+                        >
                           <div>
-                            <p className="font-medium text-slate-900">{item.item_name}</p>
-                            <p className="text-sm text-slate-600">Qty: {item.quantity} × ₹{item.unit_price}/-</p>
+                            <p className="font-medium text-slate-900">
+                              {item.item_name}
+                            </p>
+                            <p className="text-sm text-slate-600">
+                              Qty: {item.quantity} × ₹{item.unit_price}/-
+                            </p>
                           </div>
-                          <p className="font-medium text-slate-900">₹{item.total_price}</p>
+                          <p className="font-medium text-slate-900">
+                            ₹{item.total_price}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -268,12 +342,18 @@ export default function MyOrders() {
                   {/* Delivery Information */}
                   {order.delivery_address && (
                     <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-slate-900 mb-2">Delivery Address</h4>
+                      <h4 className="font-semibold text-slate-900 mb-2">
+                        Delivery Address
+                      </h4>
                       <p className="text-sm text-slate-700">
-                        {order.delivery_address.address}, {order.delivery_address.city} - {order.delivery_address.pincode}
+                        {getParsedValue(order.delivery_address).address}
+                        {getParsedValue(order.delivery_address).city}
+                        {getParsedValue(order.delivery_address).pincode}
                       </p>
                       <p className="text-sm text-slate-600 mt-1">
-                        Contact: {order.delivery_address.contact_person} ({order.delivery_address.phone})
+                        Contact:{" "}
+                        {getParsedValue(order.delivery_address).contact_person}{" "}
+                        ({getParsedValue(order.delivery_address).phone})
                       </p>
                     </div>
                   )}
@@ -282,15 +362,21 @@ export default function MyOrders() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
                     <div className="text-sm">
                       <span className="text-slate-600">Subtotal:</span>
-                      <span className="font-medium ml-2">₹{order.total_amount.toLocaleString()}</span>
+                      <span className="font-medium ml-2">
+                        ₹{order.total_amount.toLocaleString()}
+                      </span>
                     </div>
                     <div className="text-sm">
                       <span className="text-slate-600">Commission:</span>
-                      <span className="font-medium ml-2 text-red-600">-₹{(order.commission_amount || 0).toLocaleString()}</span>
+                      <span className="font-medium ml-2 text-red-600">
+                        -₹{(order.commission_amount || 0).toLocaleString()}
+                      </span>
                     </div>
                     <div className="text-sm">
                       <span className="text-slate-600">You Pay (COD):</span>
-                      <span className="font-bold ml-2 text-green-600">₹{order.total_amount.toLocaleString()}</span>
+                      <span className="font-bold ml-2 text-green-600">
+                        ₹{order.total_amount.toLocaleString()}
+                      </span>
                     </div>
                   </div>
 
@@ -298,7 +384,8 @@ export default function MyOrders() {
                   {order.tracking_number && (
                     <div className="mt-4 p-3 bg-green-50 rounded-lg">
                       <p className="text-sm text-green-800">
-                        <strong>Tracking Number:</strong> {order.tracking_number}
+                        <strong>Tracking Number:</strong>{" "}
+                        {order.tracking_number}
                       </p>
                     </div>
                   )}
