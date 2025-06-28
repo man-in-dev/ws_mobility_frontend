@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://ws-mobility-backend.vercel.app/api';
 
 function getToken() {
     return localStorage.getItem('token');
